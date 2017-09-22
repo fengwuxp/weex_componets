@@ -1,8 +1,0 @@
-.default_button_container{
-  justify-content: center;
-  flex-direction: row;
-}
-.button_default{
-  flex: 1;
-  text-align: center;
-}

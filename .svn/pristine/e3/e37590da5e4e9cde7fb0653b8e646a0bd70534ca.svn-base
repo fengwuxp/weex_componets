@@ -1,4 +1,0 @@
-##### mixin，可以非常简单的理解，就是把 一个 mixin 对象上的方法都混合到了另一个组件上，和 $.extend 方法做的事情类似。
-##### mixin-->混入  参考文章：[http://blog.csdn.net/lihongxun945/article/details/46416961]
-
-##### 可以参考vue官网 [https://cn.vuejs.org/v2/api/#mixins]

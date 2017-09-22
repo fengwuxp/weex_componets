@@ -1,5 +1,0 @@
-.input_default{
-  border-width: 0;
-  padding-left: 10px;
-  line-height: 60px;
-}
