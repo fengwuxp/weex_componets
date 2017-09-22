@@ -1,0 +1,534 @@
+'use strict';
+// babel-plugin-__coverage__
+//
+// This is my first Babel plugin, and I wrote it during the night.
+// Therefore, be prepared to see a lot of copypasta and wtf code.
+
+var _babelCore = require('babel-core');
+
+var _babelTemplate = require('babel-template');
+
+var _babelTemplate2 = _interopRequireDefault(_babelTemplate);
+
+var _babelHelperFunctionName = require('babel-helper-function-name');
+
+var _babelHelperFunctionName2 = _interopRequireDefault(_babelHelperFunctionName);
+
+var _fs = require('fs');
+
+var _crypto = require('crypto');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var ignoreRE = /(?:coverage|istanbul) ignore (next|if|else)/;
+
+var coverageTemplate = (0, _babelTemplate2.default)('\n  var FILE_COVERAGE\n  function COVER () {\n    if (!FILE_COVERAGE) FILE_COVERAGE = GET_INITIAL_FILE_COVERAGE()\n    return FILE_COVERAGE\n  }\n  function GET_INITIAL_FILE_COVERAGE () {\n    var path = PATH, hash = HASH\n    var global = (new Function(\'return this\'))()\n    var coverage = global[\'__coverage__\'] || (global[\'__coverage__\'] = { })\n    if (coverage[path] && coverage[path].hash === hash) return coverage[path]\n    var coverageData = global[\'JSON\'].parse(INITIAL)\n    coverageData.hash = hash\n    return coverage[path] = coverageData\n  }\n');
+
+//
+// Takes a relative path and returns a real path.
+// Assumes the path name is relative to working directory.
+//
+function getRealpath(n) {
+  try {
+    return (0, _fs.realpathSync)(n) || n;
+  } catch (e) {
+    return n;
+  }
+}
+
+/**
+ * This determines whether the given state and options combination
+ * should result in the file being ignored and not covered
+ * Big thanks to babel-plugin-transform-adana and their CC0-1.0 license
+ * from which this code was mostly copy/pasted
+ */
+function skip() {
+  var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+  var opts = _ref.opts;
+  var file = _ref.file;
+
+  if (file && opts) {
+    var _opts$ignore = opts.ignore;
+    var ignore = _opts$ignore === undefined ? [] : _opts$ignore;
+    var only = opts.only;
+
+    return _babelCore.util.shouldIgnore(file.opts.filename, _babelCore.util.arrayify(ignore, _babelCore.util.regexify), only ? _babelCore.util.arrayify(only, _babelCore.util.regexify) : null);
+  }
+  return false;
+}
+
+module.exports = function (_ref2) {
+  var t = _ref2.types;
+
+  //
+  // Return the immediate data structure local to a file.
+  //
+  function getData(context) {
+    var path = getRealpath(context.file.opts.filename);
+    //
+    // XXX: Is it OK to mutate `context.file`? I don’t know but it works!
+    //
+    return context.file.__coverage__data || (context.file.__coverage__data = {
+      //
+      // Initial data that will be added in front of generated source code
+      base: {
+        path: path,
+        s: {},
+        b: {},
+        f: {},
+        statementMap: {},
+        fnMap: {},
+        branchMap: {}
+      },
+      //
+      // The counter that generates the next ID for each statement type.
+      nextId: {
+        s: 1,
+        b: 1,
+        f: 1
+      },
+      //
+      // True if coverage info is already emitted.
+      sealed: false,
+      // Ignore zone information
+      ignoreZones: []
+    });
+  }
+
+  //
+  // Turns a `SourceLocation` into a plain object.
+  //
+  function locToObject(loc) {
+    return {
+      start: {
+        line: loc.start.line,
+        column: loc.start.column
+      },
+      end: {
+        line: loc.end.line,
+        column: loc.end.column
+      }
+    };
+  }
+
+  //
+  // Generates an AST representing an expression that will increment the
+  // code coverage counter.
+  //
+  function increase(context, type, id, index) {
+    var wrap = index != null
+    // If `index` present, turn `x` into `x[index]`.
+    ? function (x) {
+      return t.memberExpression(x, t.numericLiteral(index), true);
+    } : function (x) {
+      return x;
+    };
+    return t.unaryExpression('++', wrap(t.memberExpression(t.memberExpression(t.callExpression(getData(context).id, []), t.identifier(type)), t.stringLiteral(id), true)));
+  }
+
+  //
+  // Adds coverage traking expression to a path.
+  //
+  // - If it’s a statement (`a`), turns into `++coverage; a`.
+  // - If it’s an expression (`x`), turns into `(++coverage, x)`.
+  //
+  function instrument(path, increment) {
+    if (path.isBlockStatement()) {
+      path.node.body.unshift(t.expressionStatement(increment));
+    } else if (path.isStatement()) {
+      path.insertBefore(t.expressionStatement(increment));
+    } else if (path.isExpression()) {
+      path.replaceWith(t.sequenceExpression([increment, path.node]));
+    } else {
+      throw new Error('wtf? I can’t cover a ' + path.node.type + '!!!!??');
+    }
+  }
+
+  //
+  // Adds coverage to any statement.
+  //
+  function instrumentStatement(context, path) {
+    var node = path.node;
+    if (!node) return;
+
+    // Don’t cover code generated by Babel.
+    if (!node.loc) return;
+
+    // Make sure we don’t cover already instrumented code (only applies to statements).
+    // XXX: Hacky node mutation again. PRs welcome!
+    if (node.__coverage__instrumented) return;
+    node.__coverage__instrumented = true;
+
+    // variable declaration is not instrumentable in certain positions
+    if (path.isVariableDeclaration() && (path.parentPath.isForStatement() || path.parentPath.isForOfStatement() || path.parentPath.isForInStatement() || path.parentPath.isExportNamedDeclaration())) {
+      return;
+    }
+
+    var id = nextStatementId(context, path);
+    instrument(path, increase(context, 's', id));
+  }
+
+  //
+  // check a path to see if it has a ignore comment
+  // set the zone
+  //
+  function checkIgnoredPath(path, data) {
+    path.node.leadingComments && path.node.leadingComments.some(function (comment) {
+      var match = String(comment.value).match(ignoreRE);
+      if (match) {
+        var type = match[1];
+        if (type === 'next') {
+          data.ignoreZones.push({
+            type: type,
+            start: path.node.start,
+            end: path.node.end
+          });
+        } else if (path.isIfStatement()) {
+          var childPath = void 0;
+          if (type === 'if' && (childPath = path.get('consequent'))) {
+            data.ignoreZones.push({
+              type: type,
+              start: childPath.node.start,
+              end: childPath.node.end
+            });
+          } else if (type === 'else' && (childPath = path.get('alternate'))) {
+            data.ignoreZones.push({
+              type: type,
+              start: childPath.node.start,
+              end: childPath.node.end
+            });
+          }
+        }
+        return true;
+      }
+    });
+  }
+
+  //
+  // check if a path is within an ignore zone
+  //
+  function getIgnoreZoneType(path, data) {
+    var type = void 0;
+    data.ignoreZones.some(function (zone) {
+      if (zone.start <= path.node.start && zone.end >= path.node.end) {
+        type = zone.type;
+        return true;
+      }
+    });
+    return type;
+  }
+
+  //
+  // Returns the next statement ID.
+  //
+  function nextStatementId(context, path) {
+    var data = getData(context);
+    var id = String(data.nextId.s++);
+    data.base.s[id] = 0;
+    data.base.statementMap[id] = locToObject(path.node.loc);
+    if (getIgnoreZoneType(path, data)) {
+      data.base.statementMap[id].skip = true;
+    }
+    return id;
+  }
+
+  //
+  // Returns the next branch ID and adds the information to `branchMap` object.
+  //
+  function nextBranchId(context, path, type, locations) {
+    var line = path.node.loc.start.line;
+    var data = getData(context);
+    var id = String(data.nextId.b++);
+    data.base.b[id] = locations.map(function () {
+      return 0;
+    });
+    var branch = data.base.branchMap[id] = { line: line, type: type, locations: locations.map(locToObject) };
+    if (getIgnoreZoneType(path, data) === 'next') {
+      branch.locations.forEach(function (loc) {
+        loc.skip = true;
+      });
+    } else if (path.isIfStatement()) {
+      var childPath = void 0;
+      if ((childPath = path.get('consequent')) && getIgnoreZoneType(childPath, data) === 'if') {
+        branch.locations[0].skip = true;
+      }
+      if ((childPath = path.get('alternate')) && getIgnoreZoneType(childPath, data) === 'else') {
+        branch.locations[1].skip = true;
+      }
+    }
+    return id;
+  }
+
+  //
+  // `a` => `++coverage; a` For most common type of statements.
+  //
+  function coverStatement(path) {
+    instrumentStatement(this, path);
+  }
+
+  //
+  // Adds branch coverage to `if` statements.
+  //
+  function coverIfStatement(path) {
+    if (!path.node.loc) return;
+    var loc0 = path.node.loc;
+    var node = path.node;
+    makeBlock(path.get('consequent'));
+    makeBlock(path.get('alternate'));
+    var loc1 = node.consequent && node.consequent.loc || loc0;
+    var loc2 = node.alternate && node.alternate.loc || loc1;
+    var id = nextBranchId(this, path, 'if', [loc1, loc2]);
+    instrument(path.get('consequent'), increase(this, 'b', id, 0));
+    instrument(path.get('alternate'), increase(this, 'b', id, 1));
+    instrumentStatement(this, path);
+  }
+
+  //
+  // Turns path into block.
+  //
+  function makeBlock(path) {
+    if (!path.node) {
+      return path.replaceWith(t.blockStatement([]));
+    }
+    if (!path.isBlockStatement()) {
+      return path.replaceWith(t.blockStatement([path.node]));
+    }
+  }
+
+  //
+  // Adds branch coverage to `switch` statements.
+  //
+  function coverSwitchStatement(path) {
+    var _this = this;
+
+    if (!path.node.loc) return;
+    instrumentStatement(this, path);
+    var validCases = path.get('cases').filter(function (p) {
+      return p.node.loc;
+    });
+    var id = nextBranchId(this, path, 'switch', validCases.map(function (p) {
+      return p.node.loc;
+    }));
+    var index = 0;
+    validCases.forEach(function (p) {
+      if (p.node.test) {
+        instrumentStatement(_this, p.get('test'));
+      }
+      p.node.consequent.unshift(increase(_this, 'b', id, index++));
+    });
+  }
+
+  //
+  // `for (;; x)` => `for (;; ++coverage, x)`.
+  // Because the increment may be stopped in the first iteration due to `break`.
+  //
+  function coverForStatement(path) {
+    makeBlock(path.get('body'));
+    instrumentStatement(this, path);
+    instrumentStatement(this, path.get('update'));
+  }
+
+  //
+  // Turn the body into block. This fixes some really weird edge cases where
+  // `while (x) if (y) z` is missing coverage on `z`.
+  //
+  function coverLoopStatement(path) {
+    makeBlock(path.get('body'));
+    instrumentStatement(this, path);
+  }
+
+  //
+  // Covers a function.
+  //
+  function coverFunction(path) {
+    if (!path.node.loc) return;
+    var node = path.node;
+    var data = getData(this);
+    var id = String(data.nextId.f++);
+    var nameOf = function nameOf(namedNode) {
+      return namedNode && namedNode.id && namedNode.id.name || null;
+    };
+    data.base.f[id] = 0;
+    data.base.fnMap[id] = {
+      name: nameOf((0, _babelHelperFunctionName2.default)(path)), // I love Babel!
+      line: node.loc.start.line,
+      loc: locToObject(node.loc)
+    };
+    if (getIgnoreZoneType(path, data)) {
+      data.base.fnMap[id].skip = true;
+    }
+    var increment = increase(this, 'f', id);
+    var body = path.get('body');
+    if (body.isBlockStatement()) {
+      body.node.body.unshift(t.expressionStatement(increment));
+    } else if (body.isExpression()) {
+      var sid = nextStatementId(this, body);
+      body.replaceWith(t.sequenceExpression([increment, increase(this, 's', sid), body.node]));
+    } else {
+      throw new Error('wtf?? Can’t cover function with ' + body.node.type);
+    }
+  }
+
+  //
+  // Adds branch coverage for conditional expressions.
+  //
+  function coverConditionalExpression(path) {
+    if (path.node.loc) {
+      var node = path.node;
+      var loc1 = node.consequent.loc || node.loc;
+      var loc2 = node.alternate.loc || loc1;
+      var id = nextBranchId(this, path, 'cond-expr', [loc1, loc2]);
+      instrument(path.get('consequent'), increase(this, 'b', id, 0));
+      instrument(path.get('alternate'), increase(this, 'b', id, 1));
+    }
+  }
+
+  //
+  // Adds branch coverage for logical expressions.
+  //
+  function coverLogicalExpression(path) {
+    if (!path.node.loc) return;
+    var node = path.node;
+    var loc1 = node.left.loc || node.loc;
+    var loc2 = node.right.loc || loc1;
+    var id = nextBranchId(this, path, 'binary-expr', [loc1, loc2]);
+    instrument(path.get('left'), increase(this, 'b', id, 0));
+    instrument(path.get('right'), increase(this, 'b', id, 1));
+  }
+
+  //
+  // `(function (a = x) { })` => `(function (a = (++coverage, x)) { })`.
+  // Because default may not be evaluated.
+  //
+  function coverAssignmentPattern(path) {
+    instrumentStatement(this, path.get('right'));
+  }
+
+  // If the coverage for this file is sealed, make the guarded function noop.
+  // It is here to fix some very weird edge case in `fixtures/imports.js`
+  var guard = function guard(f) {
+    return function (path, state) {
+      if (skip(state)) return;
+      if (getData(this).sealed) return;
+      checkIgnoredPath(path, getData(this));
+      return f.call(this, path);
+    };
+  };
+
+  var coverWith = process.env.BABEL_PLUGIN__COVERAGE__TEST
+  // Defer execution so we can measure coverage easily.
+  ? function (f) {
+    return guard(function () {
+      return f().apply(this, arguments);
+    });
+  }
+  // Execute immediately so it runs faster at runtime.
+  // NOTE: This case should have already been covered due to
+  //       self-instrumentation to generate `lib-cov`.
+  : function (f) {
+    return guard(f());
+  };
+
+  return {
+    visitor: {
+      //
+      // Shamelessly copied from istanbul.
+      //
+      ExpressionStatement: coverWith(function () {
+        return coverStatement;
+      }),
+      BreakStatement: coverWith(function () {
+        return coverStatement;
+      }),
+      ContinueStatement: coverWith(function () {
+        return coverStatement;
+      }),
+      DebuggerStatement: coverWith(function () {
+        return coverStatement;
+      }),
+      ReturnStatement: coverWith(function () {
+        return coverStatement;
+      }),
+      ThrowStatement: coverWith(function () {
+        return coverStatement;
+      }),
+      TryStatement: coverWith(function () {
+        return coverStatement;
+      }),
+      VariableDeclaration: coverWith(function () {
+        return coverStatement;
+      }),
+      IfStatement: coverWith(function () {
+        return coverIfStatement;
+      }),
+      ForStatement: coverWith(function () {
+        return coverForStatement;
+      }),
+      ForInStatement: coverWith(function () {
+        return coverLoopStatement;
+      }),
+      ForOfStatement: coverWith(function () {
+        return coverLoopStatement;
+      }),
+      WhileStatement: coverWith(function () {
+        return coverLoopStatement;
+      }),
+      DoWhileStatement: coverWith(function () {
+        return coverStatement;
+      }),
+      SwitchStatement: coverWith(function () {
+        return coverSwitchStatement;
+      }),
+      ArrowFunctionExpression: coverWith(function () {
+        return coverFunction;
+      }),
+      FunctionExpression: coverWith(function () {
+        return coverFunction;
+      }),
+      FunctionDeclaration: coverWith(function () {
+        return coverFunction;
+      }),
+      LabeledStatement: coverWith(function () {
+        return coverStatement;
+      }),
+      ConditionalExpression: coverWith(function () {
+        return coverConditionalExpression;
+      }),
+      LogicalExpression: coverWith(function () {
+        return coverLogicalExpression;
+      }),
+      AssignmentPattern: coverWith(function () {
+        return coverAssignmentPattern;
+      }),
+
+      Program: {
+        enter: function enter(path, state) {
+          if (skip(state)) return;
+          // Save the variable name used for tracking coverage.
+          getData(this).id = path.scope.generateUidIdentifier('__cover__');
+        },
+        exit: function exit(path, state) {
+          var _path$node$body;
+
+          if (skip(state)) return;
+          // Prepends the coverage runtime.
+          var realPath = getRealpath(this.file.opts.filename);
+          var initialJson = JSON.stringify(getData(this).base);
+          var hash = (0, _crypto.createHash)('md5').update(initialJson).digest('hex');
+          getData(this).sealed = true;
+          (_path$node$body = path.node.body).unshift.apply(_path$node$body, _toConsumableArray(coverageTemplate({
+            GET_INITIAL_FILE_COVERAGE: path.scope.generateUidIdentifier('__coverage__getInitialState'),
+            FILE_COVERAGE: path.scope.generateUidIdentifier('__coverage__file'),
+            COVER: getData(this).id,
+            PATH: t.stringLiteral(realPath),
+            INITIAL: t.stringLiteral(initialJson),
+            HASH: t.stringLiteral(hash)
+          })));
+        }
+      }
+    }
+  };
+};

@@ -1,0 +1,35 @@
+$defaultFontSize: 32px;  /*默认字体大小*/
+$smallFontSize:30px;    /*小号字体*/
+
+$defaultFontColor:#3c3c3c;  /*默认字体颜色*/
+
+@mixin default_font_Size{
+  font-size:$defaultFontSize;
+}
+
+.text_default{
+  color:$defaultFontColor ;
+  @include default_font_Size;
+}
+
+.text_small{
+  color: $defaultFontColor;
+  font-size:$smallFontSize;
+}
+
+.text_red{
+  @include default_font_Size;
+  color: red;
+}
+.text_666 {
+  font-size: 30px;
+  color: #666666;
+}
+
+.text_ff9800{
+  @include default_font_Size;
+  color: #ff9800
+}
+.text_right{
+  text-align: right;
+}

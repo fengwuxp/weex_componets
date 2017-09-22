@@ -1,0 +1,16 @@
+
+.padding_left_20 {
+  padding-left: 20px;
+}
+
+.padding_tb_25{
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
+.padding_20{
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 25px;
+  padding-bottom: 25px;
+}

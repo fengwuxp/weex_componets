@@ -1,0 +1,72 @@
+{
+  "_from": "wxp_weex_componets@^1.0.1",
+  "_id": "wxp_weex_componets@1.0.1",
+  "_inBundle": false,
+  "_integrity": "sha512-eia5H9dCDXQDod7Wj94+ziDyIiVGwvgV3MGciS/N2qtkIaIQZBwLpqGPqgYcxD674Imw8OJ2nfuj9zHBnkJ8Iw==",
+  "_location": "/wxp_weex_componets",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "wxp_weex_componets@^1.0.1",
+    "name": "wxp_weex_componets",
+    "escapedName": "wxp_weex_componets",
+    "rawSpec": "^1.0.1",
+    "saveSpec": null,
+    "fetchSpec": "^1.0.1"
+  },
+  "_requiredBy": [
+    "#DEV:/"
+  ],
+  "_resolved": "http://nexus.oaknt.com:18081/repository/oak_npm_group/wxp_weex_componets/-/wxp_weex_componets-1.0.1.tgz",
+  "_shasum": "e9ccb31ebbd4b42533e5bed004ef1d91d744cd12",
+  "_spec": "wxp_weex_componets@^1.0.1",
+  "_where": "E:\\workspace\\idea\\npm_packages\\weex_componets",
+  "author": {
+    "name": "wxp"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "grunt": "^1.0.1"
+  },
+  "deprecated": false,
+  "description": "weex组件",
+  "devDependencies": {
+    "awesome-typescript-loader": "^3.2.2",
+    "babel-core": "^6.24.1",
+    "babel-istanbul": "^0.11.0",
+    "babel-loader": "^7.0.0",
+    "babel-plugin-coverage": "^1.0.0",
+    "babel-plugin-import": "^1.1.1",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-register": "^6.24.1",
+    "babel-runtime": "^6.11.6",
+    "css-loader": "^0.28.1",
+    "html-webpack-plugin": "^2.6.5",
+    "isomorphic-fetch": "^2.2.1",
+    "node-sass": "^4.5.3",
+    "quick-local-ip": "^1.0.7",
+    "reflect-metadata": "^0.1.10",
+    "style-loader": "^0.13.2",
+    "typescript": "^2.4.2",
+    "typings": "^2.1.1",
+    "webpack": "^3.4.1",
+    "webpack-dev-middleware": "^1",
+    "webpack-dev-server": "^2.6.1"
+  },
+  "keywords": [
+    "weex"
+  ],
+  "license": "ISC",
+  "main": "index.js",
+  "name": "wxp_weex_componets",
+  "publishConfig": {
+    "registry": "http://nexus.oaknt.com:18081/repository/oak_npm_hosted/"
+  },
+  "scripts": {
+    "build:web-prod": "webpack --config webpack.prod.config.js --progress --colors"
+  },
+  "version": "1.0.1"
+}

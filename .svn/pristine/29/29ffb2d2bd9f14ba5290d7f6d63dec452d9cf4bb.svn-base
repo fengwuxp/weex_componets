@@ -1,0 +1,45 @@
+/**
+ * Created by wuxp on 2017/6/6.
+ */
+import {isNullOrUndefined} from "util";
+
+const moneyRegExp = /^[0-9]+[\.]?[0-9]{0,2}$/;
+
+class CommonUtils {
+
+    constructor() {}
+
+    /**
+     * 是否为金额
+     * @param value
+     * @return {boolean}
+     */
+    isMoney = (value: any): Boolean => {
+
+        if (value === null) {
+            return true;
+        }
+
+        if (moneyRegExp.test(value)) {
+            //金额输入校验
+            return true;
+        }
+
+
+        if (value.trim().length === 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 对象是否为空或者null
+     * @param obj
+     * @return {Boolean}
+     */
+    isNullOrUndefined(obj:any):Boolean{
+       return isNullOrUndefined(obj);
+    }
+}
+
+export default new CommonUtils();

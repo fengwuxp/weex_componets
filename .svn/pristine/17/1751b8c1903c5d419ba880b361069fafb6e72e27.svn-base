@@ -1,0 +1,74 @@
+const path = require('path');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
+
+const bannerPlugin = new webpack.BannerPlugin({
+    banner: '// { "framework": "Vue" }\n',
+    raw: true
+})
+
+function getBaseConfig() {
+    return {
+        entry: {
+            app: path.resolve('src', 'Main')
+        },
+        output: {
+            path: path.resolve(__dirname, 'dist_web')
+        },
+        resolve: {
+            extensions: [".ts", ".tsx", "d.ts", ".js", ".css", ".vue"]
+
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.js$/,
+                    loader: 'babel-loader',
+                    exclude: /node_modules/
+                },
+                {
+                    test: /\.vue$/,
+                    loaders: []
+                },
+                {
+                    test: /\.ts$/,
+                    loader: 'awesome-typescript-loader',
+                    exclude: /node_modules/,
+                    options: {
+                        appendTsSuffixTo: [/\.vue$/]
+                    }
+                },
+                {
+                    // 配置sass编译规则
+                    test: /\.s[a|c]ss$/,
+                    loader:['style-loader','css-loader',"sass-loader"]
+                },
+                {
+                    test: /\.less/,
+                    loader:['style-loader','css-loader',"sass-loader"]
+                },
+                {
+                    test: /\.css$/,
+                    use: ['style-loader', 'css-loader', 'postcss-loader']
+                }
+            ]
+        },
+        plugins: [
+            bannerPlugin,
+            new HtmlWebpackPlugin({
+                template: './src/index.html',
+                filename: "index.html",
+                title: "健农网运营端",
+                chunks: ["app"],
+                inject: false,
+            })
+        ]
+    }
+}
+
+const webConfig = getBaseConfig();
+webConfig.output.filename = '[name].web.js';
+webConfig.module.rules[1].loaders.push('vue-loader');
+
+module.exports = [webConfig];

@@ -1,0 +1,11 @@
+if (weex.config.env.platform.toLowerCase() === 'web') {
+
+    const timer={
+        setTimeout:(callback=()=>{},times=10)=>{
+           setTimeout(callback,times)
+        }
+    };
+
+    console.log("注册自定义模块 timer");
+    weex.registerModule('timer', timer);
+}

@@ -1,0 +1,9 @@
+/*导出一些常量*/
+
+//保存会员的key
+const LOGIN_MEMBER_KEY = "LOGIN_MEMBER_KEY";
+
+
+export {
+    LOGIN_MEMBER_KEY
+}

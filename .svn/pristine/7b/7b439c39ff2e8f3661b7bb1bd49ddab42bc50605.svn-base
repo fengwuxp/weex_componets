@@ -1,0 +1,109 @@
+/**
+ * Created by wuxp on 2017/5/15.
+ */
+import weexUtils from "./WeexUtils";
+
+/**
+ * 导航目标为事件时的处理
+ * @param vueInstance                vue实例对象
+ * @param {string} actionName        事件名称
+ * @param {Function} resultHandler   事件结果处理者
+ * @return {Promise<Function>}
+ * @constructor
+ */
+const NavTargetHandlerAction = (vueInstance: any, actionName: string, resultHandler: Function = (result) => {
+    return result;
+}): Promise<Function> => {
+    return new Promise((resolve = () => {
+    }, reject = () => {
+    }) => {
+        let result = vueInstance[actionName]();
+        if (resultHandler(result)) {
+            resolve(result);
+        } else {
+            reject(result);
+        }
+    });
+};
+
+//导航目标为视图
+ const  NAV_TARGET_VIEW="view";
+
+
+ const VIEW_CONFIG={
+     //采购
+     PURCHASER:{
+         home:"workbench/PurchaseView.js",
+         person:"member/PersonCenterView.js"
+     },
+     //司机
+     TRANSPORT:{
+         home:"workbench/TransportDriverView.js",
+         person:"member/PersonCenterView.js"
+     },
+     //城区配送员
+     CITY_DELIVERY:{
+         home:"workbench/CityDeliveryView.js",
+         person:"member/PersonCenterView.js"
+     }
+
+ };
+
+
+/**
+ * 获取导航数据
+ * @type {{getButtonNav: ((navSelected: number, weex) => any)}}
+ */
+const GetNavDataUtils = {
+
+    getButtonNav(navSelected: number = 0, weex) {
+
+        const navData: any = {
+            navSelected: navSelected,
+            navItems: [
+                {
+                    icon: weexUtils.getResourcesURL("/images/nav/workbench.png", weex),
+                    text: "工作台",
+                    url: "/order",
+                    target: NAV_TARGET_VIEW
+                },
+                {
+                    icon: weexUtils.getResourcesURL("/images/nav/scan_code_icon.png?12356", weex),
+                    text: "扫码",
+                    target: NavTargetHandlerAction
+
+                },
+                {
+                    icon: weexUtils.getResourcesURL("/images/nav/user_center_icon.png", weex),
+                    text: "我的",
+                    url: "/store",
+                    target: NAV_TARGET_VIEW
+                },
+            ]
+        };
+        navData.navItems.forEach((item, i) => {
+            if (i === navSelected) {
+                item.textColor = {color: "#4FB57A"};
+                item.icon = item.icon.replace("nav/", "nav/activate_");
+            } else {
+                item.textColor = {color: "#3f3c3c"};
+            }
+
+        });
+        return navData;
+    },
+
+    /**
+     * 根据用户类型获取视图
+     * @param {MemberType} type  用户类型
+     * @return {Object}
+     */
+    getViewByMemberType(type:string):Object{
+
+        return VIEW_CONFIG[type];
+    }
+};
+export {
+    NAV_TARGET_VIEW,
+    GetNavDataUtils
+}

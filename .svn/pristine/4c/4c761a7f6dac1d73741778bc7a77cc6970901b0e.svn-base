@@ -1,0 +1,79 @@
+{
+  "_from": "clipboardy@1.1.1",
+  "_id": "clipboardy@1.1.1",
+  "_inBundle": false,
+  "_integrity": "sha1-dbWnrFDYPJgCX7YwMpjGqQB8Fsc=",
+  "_location": "/micro/clipboardy",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "clipboardy@1.1.1",
+    "name": "clipboardy",
+    "escapedName": "clipboardy",
+    "rawSpec": "1.1.1",
+    "saveSpec": null,
+    "fetchSpec": "1.1.1"
+  },
+  "_requiredBy": [
+    "/micro"
+  ],
+  "_resolved": "http://nexus.oaknt.com:18081/repository/oak_npm_group/clipboardy/-/clipboardy-1.1.1.tgz",
+  "_shasum": "75b5a7ac50d83c98025fb6303298c6a9007c16c7",
+  "_spec": "clipboardy@1.1.1",
+  "_where": "E:\\workspace\\idea\\npm_packages\\weex_componets\\node_modules\\micro",
+  "author": {
+    "name": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com"
+  },
+  "bugs": {
+    "url": "https://github.com/sindresorhus/clipboardy/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "execa": "^0.6.0"
+  },
+  "deprecated": false,
+  "description": "Access the system clipboard (copy/paste)",
+  "devDependencies": {
+    "ava": "*",
+    "xo": "*"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "fallbacks",
+    "vendor"
+  ],
+  "homepage": "https://github.com/sindresorhus/clipboardy#readme",
+  "keywords": [
+    "clipboard",
+    "copy",
+    "paste",
+    "copy-paste",
+    "pasteboard",
+    "read",
+    "write",
+    "pbcopy",
+    "clip",
+    "xclip",
+    "xsel"
+  ],
+  "license": "MIT",
+  "name": "clipboardy",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sindresorhus/clipboardy.git"
+  },
+  "scripts": {
+    "test": "xo && ava"
+  },
+  "version": "1.1.1",
+  "xo": {
+    "esnext": true
+  }
+}
