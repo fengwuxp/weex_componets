@@ -362,8 +362,6 @@
 
 </script>
 
-<style>
-    .web-upload {
+<style scoped>
 
-    }
 </style>

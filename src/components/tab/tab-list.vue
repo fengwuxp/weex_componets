@@ -1,21 +1,26 @@
 <template>
     <div class="flex_cell">
-        <tab-item-header ref="tab_item_eader"
-                         v-if="useHeader"
-                         :items="items"
-                         :defaultStyle="defaultStyle"
-                         :selectedStyle="selectedStyle"
-                         :selectedIndex="selectedIndex"
-                         @changeTabItem="changeTabItem"
-                         @changeTabIndex="changeTabIndex"
-        ></tab-item-header>
+        <tab-item-header
+                v-if="useHeader"
+                ref="tab_item_eader"
+                style="justify-content: flex-start"
+                :items="items"
+                :defaultStyle="defaultStyle"
+                :selectedStyle="selectedStyle"
+                :selectedIndex="selectedIndex"
+                @changeTabItem="changeTabItem"
+                @changeTabIndex="changeTabIndex"></tab-item-header>
         <div v-if="web"
-             v-for="(item,i) in tabList"
-             class="flex_cell"
-             :style="item.webStyle">
-            <slot :name="'tab_item'+i"></slot>
+             style="justify-content: flex-end;"
+             class="flex_cell">
+            <div v-for="(item,i) in tabList"
+                 class="flex_cell"
+                 :style="item.webStyle">
+                <slot :name="'tab_item'+i"></slot>
+            </div>
         </div>
-        <div v-if="!web" class="view_wrapper">
+        <div v-if="!web"
+             class="view_wrapper flex_cell">
             <embed class="view_content"
                    v-for="(item,i) in tabList"
                    :src="item.src"
@@ -26,6 +31,11 @@
 </template>
 <script>
     import TabItemHeader from "./tab-item-header.vue";
+
+    const defWebStyle = {display: "block", height: "100%"};
+    const hideWebStyle = {display: "none", height: "100%"};
+    const defStyle = {visibility: "visible"};
+    const hideStyle = {visibility: "hidden"}
     export default {
         components: {TabItemHeader},
         mixins: [],
@@ -41,7 +51,6 @@
                         borderBottomWidth: "0px",
                         borderBottomColor: "green",
                         borderBottomStyle: "solid"
-
                     },
                     text: {
                         fontSize: "32px",
@@ -64,14 +73,24 @@
                         color: "#303030"
                     }
                 }
-
+            },
+            viewWrapperStyle: {
+                default: {
+                    top: "78px",
+                    left: "0px",
+                    right: "0px",
+                    bottom: "0px",
+                    backrgoundColor:"red"
+                }
             },
             useHeader: {default: true},
-            selectedIndex: {default:0}
+            selectedIndex: {default: 0}
         },
         data() {
+            let web = weex.config.env.platform.toLowerCase() === "web";
+            //web=false;
             return {
-                web: weex.config.env.platform.toLowerCase() === "web",
+                web,
                 removeHeight: 180,
                 infinite: false
             };
@@ -79,11 +98,11 @@
         methods: {
             changeTabItem({currentIndex, index}) {
                 if (this.web) {
-                    this.tabList[this.selectedIndex].webStyle = {display: "none"};
-                    this.tabList[index].webStyle = {display: "block"};
+                    this.tabList[this.selectedIndex].webStyle = hideWebStyle;
+                    this.tabList[index].webStyle = defWebStyle;
                 } else {
-                    this.tabList[this.selectedIndex].style = {visibility: "hidden"};
-                    this.tabList[index].style = {visibility: "visible"};
+                    this.tabList[this.selectedIndex].style = hideStyle;
+                    this.tabList[index].style = defStyle;
                 }
                 this.tabList = Object.assign([], this.tabList);
                 this.changeTabIndex({currentIndex, index})
@@ -101,35 +120,29 @@
             }
         },
         beforeMount() {
-
             //初始化数据
             this.tabList.forEach((item, i) => {
                 if (this.selectedIndex === i) {
-                    item.webStyle = {display: "block"};
-                    item.style = {visibility: "visible"};
+                    item.webStyle = defWebStyle;
+                    item.style = defStyle;
                 } else {
-                    item.webStyle = {display: "none"};
-                    item.style = {visibility: "hidden"};
+                    item.webStyle = hideWebStyle;
+                    item.style = hideStyle
                 }
-                //  item.style={ visibility: "visible"};
             });
-            let index=parseInt(this.selectedIndex);
-            this.changeTabItem({currentIndex:0, index});
+            let index = parseInt(this.selectedIndex);
+            this.changeTabItem({currentIndex: 0, index});
         }
 
     }
 </script>
-<style>
+<style scoped>
     .flex_cell {
         flex: 1;
     }
 
     .view_wrapper {
-        position: absolute;
-        top: 78px;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        justify-content: flex-end;
     }
 
     .view_content {

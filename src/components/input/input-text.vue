@@ -139,7 +139,7 @@
             }
         },
         beforeMount() {
-            this.setValue(this.initVal);
+            this.setValue(this.initVal,false);
         }
     }
 </script>

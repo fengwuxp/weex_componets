@@ -1,12 +1,23 @@
+<!--带有背景图的顶部导航-->
 <template>
-    <div>
-        <div v-if="ios" class="ios_top" :style="iosTopStyle"></div>
-        <div class="header" :style="style">
-            <div @click="clickBackButton" :style="backStyle" class="left-back" v-if="useBack">
-                <image class="back" :src="backIconUrl"></image>
-                <text v-if="leftText" :style="leftTextStyle">{{leftText}}</text>
+    <div class="header_container" :style="containerStyle">
+        <image :src="bgImageURL" class="bg_all" :style="bgImageStyle"></image>
+        <div class="header" :style="headerStyle">
+            <div @click="clickBackButton"
+                 :style="leftStyle"
+                 class="left-back"
+                 v-if="backIconUrl.length>0">
+                <image class="back"
+                       :src="backIconUrl"></image>
+                <text v-if="leftText.length>0"
+                      :style="leftTextStyle"
+                      :value="leftText"></text>
             </div>
-            <text class="title" :style="titleStyle" @click="clickText">{{title}}</text>
+            <text class="title"
+                  :style="titleStyle"
+                  @click="clickText"
+                  :value="title">
+            </text>
             <text v-if="rightText.length>0"
                   @click="clickRight"
                   class="right-text"
@@ -31,11 +42,16 @@
     export default {
         name: "app-header",
         props: {
-            useBack: {default: true},
+            headerHeight: {
+                default: 100
+            },
             title: {default: ''},
+            titleStyle: {
+                default: appHeaderConfig.titleStyle
+            },
             rightText: {default: ""},
             rightIcon: {default: ""},
-            leftText: {defatul: ""},
+            leftText: {default: ""},
             leftTextStyle: {
                 default: {
                     fontSize: "32px",
@@ -48,17 +64,20 @@
                 }
             },
             backIconUrl: {default: weexUtils.getResourcesURL(appHeaderConfig.backImage, weex)},
-            headerStyle: {default: {}},
-            headerIosTopStyle: {default: {}},
-            headerTitleStyle: {default: {}},
-            headerRightStyle: {default: {}}
+            bgImageStyle: {
+                default: {}
+            },
+            bgImageURL: {default: weexUtils.getResourcesURL(appHeaderConfig.bagImageURL, weex)}
         },
         data() {
-            let result = appHeaderConfig.data;
-            result.ios = false;
-            return Object.assign({
-                backStyle: {height: "100px"}
-            }, result);
+            let ios = weex.config.env.platform.toLowerCase() === 'ios';
+
+            return {
+                headerStyle: {},
+                containerStyle: {},
+                ios,
+                iosTop:28
+            }
         },
         methods: {
             clickBackButton: function () {
@@ -68,27 +87,39 @@
                 this.$emit("clickHeaderText");
             },
             clickRight() {
-                this.$emit("clickHeaderRightText");
+                this.$emit("clickHeaderRight");
             }
         },
         created() {
-            this.ios = weex.config.env.platform.toLowerCase() === "ios";
-            this.style = Object.assign({}, this.style, this.headerStyle);
-            this.backStyle = Object.assign(this.backStyle, this.leftStyle);
-            if (this.style.height) {
-                this.backStyle.height = this.style.height;
+            let height = this.headerHeight;
+            if (this.ios) {
+                height += this.iosTop;
+                this.headerStyle = {
+                    paddingTop:this.iosTop+"px"
+                }
             }
-            this.iosTopStyle = Object.assign({}, this.iosTopStyle, this.headerIosTopStyle);
-            this.titleStyle = Object.assign({}, this.titleStyle, this.headerTitleStyle);
-            this.rightStyle = Object.assign({}, this.rightStyle, this.headerRightStyle);
+            this.containerStyle = {
+                height: height+"px"
+            };
+            this.headerStyle = {
+                height: height+"px",
+            }
 
         }
     }
 </script>
 
 <style scoped>
-    .ios_top {
-        flex: 1;
+    .header_container {
+        position: relative;
+    }
+
+    .bg_all {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
     }
 
     .header {
@@ -97,9 +128,6 @@
         align-items: center;
         position: relative;
         font-size: 36px;
-        border-bottom-width: 1px;
-        border-bottom-style: solid;
-
     }
 
     .back {
@@ -114,16 +142,12 @@
         align-items: center;
         left: 0;
         top: 0;
-    }
-
-    .title {
-        font-size: 36px;
+        bottom: 0;
     }
 
     .right-text {
         position: absolute;
         right: 15px;
-        top: 32px;
         font-size: 32px;
         color: #ffffff;
     }

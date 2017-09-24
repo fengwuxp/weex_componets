@@ -1,14 +1,24 @@
 <template>
-    <div class="footer">
-        <text class="copyright">{{copyright}}</text>
+    <div :style="style">
+        <text class="copyright">©Coryright {{copyright}}</text>
     </div>
 </template>
 
 <script>
     import  GlobalApiConfig from "../../api/config/GlobalAipConfig";
     const appHeaderConfig = GlobalApiConfig.APP_FOOTER_CONFIG;
-    //©Coryright福州华威菜多多电子商务有限公司
     export default{
+        props:{
+            style: {
+                default:{
+                    height:"83px",
+                    alignItems: "center",
+                    paddingTop: "25px",
+                    paddingBottom: "25px",
+                    backgroundColor: "#ededed"
+                }
+            }
+        },
         name:"app-footer",
         data(){
             return appHeaderConfig.data;
@@ -18,12 +28,6 @@
 </script>
 
 <style scoped>
-    .footer {
-        align-items: center;
-        padding-top: 25px;
-        padding-bottom: 25px;
-        background-color: #f2f2f2;
-    }
     .copyright{
         font-size: 28px;
         color: #999999;

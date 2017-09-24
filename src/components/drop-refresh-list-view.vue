@@ -1,7 +1,7 @@
 <!--下拉刷新列表视图-->
 <template>
-    <div>
-        <list :style="listStyle"
+    <div :style="styleRefreshStyle">
+        <list style="flex: 1;"
               :loadmoreoffset="loadmoreoffset"
               @scroll="viewScroll"
               @loadmore="loadmore">
@@ -23,12 +23,10 @@
     </div>
 </template>
 <script>
-    import tabbarPage from '../mixins/TabbarPage';
     import {timer} from "../utils/ExportWeexModel";
     import weexUtils from "../utils/WeexUtils";
 
     export default {
-        mixins: [tabbarPage],
         props: {
             imageStyle: {
                 default: {
@@ -61,11 +59,19 @@
             loadmoreoffset: {default: 120}
         },
         data() {
+            let web = weex.config.env.platform.toLowerCase() === "web";
+            let styleRefreshStyle={
+                flex:1
+            }
+            if(web){
+                styleRefreshStyle.height="100%";
+            }
             return {
                 showRefresh: false,
                 tipStatus: false,
                 animationFrameHandler: null,
                 currentAnimationFrame: 0, //当前下拉刷新动画的帧
+                styleRefreshStyle
             }
         },
         methods: {

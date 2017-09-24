@@ -9,7 +9,7 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          * @param success
          * @param error
          */
-        sacnWithZXing:(success=()=>{},error=()=>{})=>{
+        scanWithZXing:(success=()=>{},error=()=>{})=>{
             console.log("调用扫码模块!,web暂不支持");
         },
 
@@ -18,7 +18,7 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          * @param success
          * @param error
          */
-        sacnWithZbar:(success=()=>{},error=()=>{})=>{
+        scanWithZbar:(success=()=>{},error=()=>{})=>{
             console.log("调用扫码模块!,web暂不支持");
         }
     };

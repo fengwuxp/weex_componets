@@ -61,7 +61,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     .drop-down-container {
         position: fixed;
         top: 100px;

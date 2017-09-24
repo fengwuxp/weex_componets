@@ -23,6 +23,7 @@
                 type: Object,
                 default: function () {
                     return {
+                        viewStyle:{flex:"1"},
                         bodyScroll: false,   //页面主体是否可以滚动
                         bodyPadding: true,   //页面主体是否需要左右padding (默认20)
                         bodyIsCenter: true,  //页面主体内容是否居中(水平和垂直)
@@ -65,7 +66,7 @@
         }
     }
 </script>
-<style>
+<style scoped>
     .app {
         flex-direction: column;
     }

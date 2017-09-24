@@ -32,7 +32,7 @@
         }
     }
 </script>
-<style>
+<style scoped>
     .no_data{
         justify-content: center;
         align-items: center;
