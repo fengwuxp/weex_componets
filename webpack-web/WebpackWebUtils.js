@@ -1,4 +1,3 @@
-const path = require('path');
 const webpack = require('webpack');
 const {isExclude} = require('../webpack-native/WebpackUtils.js');
 
@@ -30,15 +29,7 @@ const getBaseConfig = function (config = {
     plugins: []
 }) {
 
-    const plugins = getPlugins(config.plugins);
-
-    return {
-        entry: {
-            app: path.resolve('src', 'Main')
-        },
-        output: {
-            path: path.resolve(__dirname, 'dist_web')
-        },
+    return Object.assign({
         resolve: {
             extensions: [".ts", ".tsx", "d.ts", ".js", ".css", ".vue"]
         },
@@ -81,8 +72,7 @@ const getBaseConfig = function (config = {
                 }
             ]
         },
-        plugins:plugins
-    }
+    },config)
 
 };
 

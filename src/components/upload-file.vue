@@ -1,33 +1,14 @@
 <template>
     <div>
-        <div v-if="web" :style="uploadWebStyle">
-            <input type="file" v-if="selectedMaxNum<=1"
-                   :accept="inputAttr.accept"
-                   :style="inputStyle" @change="uploadImage"/>
-            <input type="file" v-else multiple="multiple"
-                   :accept="inputAttr.accept"
-                   :style="inputStyle" @change="uploadImage"/>
-        </div>
-        <div v-else>
-            <image @click="uploadImage" :src="uploadFileTipImage" :style="uploadNativeStyle"></image>
-        </div>
+        <image @click="uploadImage" :src="uploadFileTipImage" :style="uploadNativeStyle"></image>
     </div>
 </template>
 
 <script>
-    import ApiReqFactory from '../utils/ApiReqFactory';
-    import weexUtils from '../utils/WeexUtils';
-
-    import GlobalConfig from '../config/GlobalConfig';
-    import systemService from '../services/system/SystemService';
-
+    import GlobalConfig from '../../../../src/config/GlobalConfig';
     const actionSheet = weex.requireModule('actionSheet');
     const photo = weex.requireModule('photo');
 
-    let wxJsUtils = {};
-    if (weex.config.env.platform.toLowerCase() === "web") {
-        wxJsUtils = require('../utils/WxJSUtils');
-    }
     const nat_camera = weex.requireModule('nat_camera');
     const nat_network_transfer = weex.requireModule('nat_network_transfer');
 
@@ -194,169 +175,12 @@
                     }
 
                 });
-
-
             },
             uploadImage(event){
-                const self = this;
-                if (weex.config.env.platform.toLowerCase() !== 'web') {
-                    //原生环境
-                    self.chooseImage();
-                    return;
-                }
-                var ua = window.navigator.userAgent.toLowerCase();
-//                if(ua.match(/MicroMessenger/i) == 'micromessenger'){
-//                    //微信
-//                    this.uploadImageInWx();
-//                }else{
-//                    //普通浏览器
-//                    this.getBase64ToWeb(event);
-//                }
-                this.getBase64ToWeb(event);
-            },
-            changeStyleInWeb(urls, options){
-                console.log(arguments);
-                urls.forEach((url) => {
-                    this.uploadWebStyle.backgroundImage = "url(" + url + ")";
-                    this.uploadWebStyle.width = options.width + "px";
-                    this.uploadWebStyle.height = options.height + "px";
-                    this.uploadWebStyle.backgroundSize = options.width + "px" + " " + options.height + "px";
-                    this.inputStyle.width = options.width + "px";
-                    this.inputStyle.height = options.height + "px";
-                });
-            },
-            uploadImageInWx(){
-                //web环境默认为wx
-                //调用wx js-sdk上传
-                //1.选择图片
-                const self = this;
-                wxJsUtils.promiseWarp("chooseImage", {
-                    count: self.selectedMaxNum, // 默认9
-                    sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-                    sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-                }).then((res) => {
-                    const promiseList = [];
-                    const urls = [];
-                    //2.上传
-                    res.localIds.forEach(function (localId, i) {
-                        const p = wxJsUtils.upload(localId);
-                        promiseList[i] = p;
-                        p.then(function (url) {
-                            urls[urls.length] = {
-                                orderNumber: self.orderNumber,
-                                url: url
-                            };
-                        }).catch(function (res) {
-                            alert("-->" + JSON.stringify(res));
-                        });
-                    });
-                    let urlMap = {};
-
-                    //所有图片都上传成功后执行 uploadCallback
-                    Promise.all(promiseList).then(function () {
-                        self.$emit("uploadCallback", {
-                            urlMap: urlMap,
-                            callback: self.changeStyleInWeb
-                        });
-                    }, function () {
-                        if (urls.length === 0) {
-                            //上传失败
-                            weexUtils.toast("上传失败!");
-                            return;
-                        }
-                        urlMap[self.type] = urls;
-                        self.$emit("uploadCallback", {
-                            urlMap: urlMap,
-                            callback: self.changeStyleInWeb
-                        });
-                    });
-                }, (res) => {
-                    alert("调用微信js-sdk失败，请检查是否处于微信环境");
-                });
-
-            },
-            getBase64ToWeb(event){
-                //在网页上调用的方法
-                //console.log(event.target);
-                const self = this;
-                let files = event.target.files;
-                const length = files.length;
-                let index = 0;
-                // console.log(files);
-                //获取文件base64编码数据
-                const fileBase64List = [];
-                let file = files[index];
-                const reader = new FileReader();
-                reader.readAsDataURL(files[index]);
-                reader.onload = function (e) {
-                    index++;
-                    self.readerOnLoad(e, file, length, fileBase64List);
-                    if (index === files.length) {
-                        //调用上传
-                        self.uploadByBase64({
-                            type: self.type, list: fileBase64List,
-                            callback: function (width=200,height=200,urls=[]) {
-                                self.changeStyleInWeb(urls,{
-                                    width,
-                                    height
-                                });
-                            }
-                        });
-                        return;
-                    }
-                    reader.readAsDataURL(files[index]);
-                };
-            },
-
-            readerOnLoad(event, file, length, fileBase64List){
-                let split = file.name.split(".");
-                let extName = split[split.length - 1];
-                fileBase64List[fileBase64List.length] = {
-                    base64Data: event.target.result,
-                    extName: extName
-                };
-            },
-            uploadByBase64: function (params) {
-                //图片上传
-                const self = this;
-                const promiseList = [];
-                const urlList = [];
-                const base64Mapping={
-                    jpg:"jpeg",
-                  png:"pnj"
-                };
-                params.list.forEach(function (data) {
-                    let extName = data.extName;
-                    const s = "data:image/" + base64Mapping[extName.toLowerCase()] + ";base64,";
-                    const param = ApiReqFactory.newInstancesReq({
-                        base64Data: data.base64Data.replace(s, ""),//由于图片真实的base64字符串编码没有这个前缀，所有需要删除
-                        extName: extName
-                    });
-
-                    const p = systemService.uploadImage(param);
-                    promiseList[promiseList.length] = p;
-                    p.then(function (url) {
-                        urlList[urlList.length] = url;
-                        self.guploadFileTipImage = url;
-                    });
-                });
-
-                Promise.all(promiseList).then(function () {
-                    const map = {};
-                    map[self.type] = [{
-                        orderNumber: self.orderNumber,
-                        url: urlList[0]
-                    }];
-                    self.$emit("uploadCallback",{
-                        urlMap: map,
-                        callback: params.callback
-                    })
-                });
-
+                this.chooseImage();
             }
         },
         created(){
-            this.web = weex.config.env.platform.toLowerCase() === "web";
         }
     }
 

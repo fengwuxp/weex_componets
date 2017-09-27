@@ -20,11 +20,11 @@ export default {
         setQueryPage(queryPage = 1) {
             this.pageInfo.queryPage = queryPage;
         },
-        setQuerySize(querySize=10){
+        setQuerySize(querySize = 10) {
             this.pageInfo.querySize = querySize;
         },
-        getPageInfo(rest=false) {
-            if(rest){
+        getPageInfo(rest = false) {
+            if (rest) {
                 this.queryStatus.end = false;
                 this.pageInfo.queryPage = 1;
             }
@@ -41,16 +41,16 @@ export default {
          * 查询动作结束
          * @param length 查询结果的长度
          */
-        queryActionEnd(length=0){
+        queryActionEnd(length = 0) {
             this.setQueryLoading(false);
-            if(length===0){
+            if (length === 0 || length < this.pageInfo.querySize) {
                 this.setQueryEnd(true);
-            }else {
+            } else {
                 this.getPageInfo().queryPage++;
             }
         },
-        queryIsLock(){
-            return this.queryStatus.loading||this.queryStatus.end;
+        queryIsLock() {
+            return this.queryStatus.loading || this.queryStatus.end;
         },
         /**
          * 处理查询结果

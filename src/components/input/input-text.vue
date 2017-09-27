@@ -48,7 +48,7 @@
                 }
             },
             clearIconURL: {
-                default: weexUtils.getResourcesURL("/images/buyer/clear_icon.png", weex)
+                default: weexUtils.getResourcesURL("images/clear_icon.png", weex)
             },
             clearIconStyle: {
                 default: {
@@ -91,7 +91,9 @@
             }
         },
         data() {
+            let web= weex.config.env.platform.toLowerCase()==="web";
             return {
+                web,
                 value: "",
                 showClearButton: false
             }
@@ -115,7 +117,7 @@
                 this.showClearButton = this.value.length > 0
             },
             inputBlur() {
-                this.showClearButton = false;
+                this.showClearButton = this.value.length > 0 && this.web;
             },
             clearValue() {
                 this.setValue("");

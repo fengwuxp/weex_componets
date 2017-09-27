@@ -37,7 +37,7 @@
                 }
             },
             clearIconURL: {
-                default: weexUtils.getResourcesURL("/images/buyer/clear_icon.png", weex)
+                default: weexUtils.getResourcesURL("images/clear_icon.png", weex)
             },
             clearIconStyle: {
                 default: {
@@ -46,7 +46,7 @@
                     marginRight: "30px"
                 }
             },
-            eyeIconURL: {default: weexUtils.getResourcesURL("/images/eye_icon.png", weex)},
+            eyeIconURL: {default: weexUtils.getResourcesURL("images/eye_icon.png", weex)},
             placeholder: {
                 default: ""
             },
@@ -75,7 +75,9 @@
             }
         },
         data() {
+            let web=weex.config.env.platform.toLowerCase()==="web";
             return {
+                web,
                 value: "",
                 inputType: "text",
                 showClearButton: false
@@ -100,7 +102,7 @@
                 this.showClearButton = this.value.length > 0
             },
             inputBlur() {
-                this.showClearButton = false;
+                this.showClearButton = this.value.length > 0 && this.web;
             },
             clearValue() {
                 this.setValue("");
