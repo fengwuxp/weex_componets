@@ -1,5 +1,5 @@
 import {isNullOrUndefined} from "util";
-import {storage, modal, cache, appMain} from './ExportWeexModel.js';
+import {storage, modal, cache, timer} from './ExportWeexModel.js';
 import EnumProxyFactory from "./EnumProxyFactory";
 import "./PromiseExt";
 import  GlobalApiConfig from "../api/config/GlobalAipConfig";
@@ -176,7 +176,7 @@ class WeexUtils {
         if (callback == null) {
             return;
         }
-        setTimeout(callback, times * 1000);
+        timer.setTimeout(callback, times * 1000);
     };
 
     /**

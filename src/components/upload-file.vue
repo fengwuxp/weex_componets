@@ -1,11 +1,11 @@
 <template>
-    <div>
-        <image @click="uploadImage" :src="uploadFileTipImage" :style="uploadNativeStyle"></image>
-    </div>
+    <image @click="uploadImage" :src="uploadFileTipImage" :style="uploadNativeStyle"></image>
 </template>
 
 <script>
-    import GlobalConfig from '../../../../src/config/GlobalConfig';
+    import GlobalApiConfig from "../api/config/GlobalAipConfig";
+    import weexUtils from "wxp_weex_componets/src/utils/WeexUtils";
+
     const actionSheet = weex.requireModule('actionSheet');
     const photo = weex.requireModule('photo');
 
@@ -13,9 +13,9 @@
     const nat_network_transfer = weex.requireModule('nat_network_transfer');
 
     //图片服务器地址
-    const picServiceURL = GlobalConfig.PIC_SERVICE_URL + "/common/picService/formUpload";
+    const picServiceURL = GlobalApiConfig.PIC_SERVICE_URL + "/common/picService/formUpload";
 
-    export default{
+    export default {
         props: {
             //上传的提示图片
             uploadFileTipImage: {
@@ -60,47 +60,39 @@
             proportion: {
                 type: Array,
                 default: [1, 1]
+            },
+            crop: {
+                default: true
+            },
+            radius:{ //圆角大小
+                default:0
             }
         },
-        data(){
+        data() {
             const width = this.width;
             const height = this.height;
-            const uploadFileTipImage = "url(" + this.uploadFileTipImage + ")";
-            let inputAttr = {};
-            inputAttr['accept'] = this.accept;
+            let uploadNativeStyle = {
+                width: width + "px",
+                height: height + "px",
+            };
             return {
-                uploadWebStyle: {
-                    width: width + "px",
-                    height: height + "px",
-                    backgroundSize: width + "px" + " " + height + "px",
-                    backgroundImage: uploadFileTipImage
-                },
-                uploadNativeStyle: {
-                    width: width + "px",
-                    height: height + "px",
-                },
-                inputStyle: {
-                    width: width + "px",
-                    height: height + "px",
-                    opacity: 0
-                },
-                inputAttr: inputAttr,
-                // fileBase64List: [],
-                web: false
+                uploadNativeStyle
             }
         },
         methods: {
-            uploadByNative(filePath){
+            uploadByNative(filePath) {
                 const self = this;
+                console.log("上传filePath：" + filePath);
                 nat_network_transfer.upload({
                     url: picServiceURL,
                     path: filePath
                 }, (result) => {
+                    console.log("-result-> " + JSON.stringify(result));
 
-                    console.log("-data-> " + JSON.stringify(data));
-
-                    const {data, ok} = result;
-                    if (data == null) {
+                    const {data, ok, progress} = result;
+                    console.log(data);
+                    console.log(ok);
+                    if (progress) {
                         console.log("上传中!");
                         return;
                     }
@@ -108,16 +100,22 @@
                         console.log("上传失败!");
                         return;
                     }
+                    if (data == null) {
+                        console.log("上传无结果!");
+                        return;
+                    }
+
                     const resp = JSON.parse(data);
                     const {url} = resp;
                     const map = {};
-                    map[self.type] = [{
+                    result = {
                         orderNumber: self.orderNumber,
-                        url: GlobalConfig.PIC_SERVICE_URL + "/" + url
-                    }];
+                        url: GlobalApiConfig.PIC_SERVICE_URL + "/" + url
+                    }
                     console.log("map->  " + JSON.stringify(map));
                     self.$emit("uploadCallback", {
-                        urlMap: map,
+                        result,
+                        type: this.type,
                         callback: function (width = 200, height = 200) {
                             self.uploadNativeStyle = {
                                 width: width + "px",
@@ -128,7 +126,7 @@
 
                 });
             },
-            chooseImage(){
+            chooseImage() {
                 //在原生环境下先选择图片
                 //http://natjs.com/#/reference/media/image
                 const items = [];
@@ -143,44 +141,42 @@
                     'message': '请选择'
                 }, (ret) => {
                     let result = ret.result;
-                    if (result === 'success') {
-                        const {value, index} = ret.data;
-                        const proportion = {};
-                        if (self.proportion.length === 0) {
-                            //表示不限制
-                        } else {
-                            proportion.aspectX = self.proportion[0];
-                            proportion.aspectY = self.proportion[1]
-                        }
-                        const {aspectX, aspectY} = proportion;
-                        if (index === 0) {
-                            photo.captureImage(true, {aspectX: aspectX, aspectY: aspectY}, ({result, path}) => {
-                                console.log("result-> " + result)
-                                console.log("path-> " + path)
-                                console.log("-参数-> " + JSON.stringify(arguments));
-                                if (result) {
-                                    self.uploadByNative(path);
-                                }
-                            });
-                        } else if (index === 1) {
-                            photo.captureImage(false, {aspectX: aspectX, aspectY: aspectY}, ({result, path}) => {
-                                console.log("result-> " + result)
-                                console.log("path-> " + path)
-                                console.log("-参数->" + JSON.stringify(arguments));
-                                if (result) {
-                                    self.uploadByNative(path);
-                                }
-                            });
-                        }
+                    console.log("-图片选择或拍照结果-> " + JSON.stringify(ret));
+                    if (result !== 'success') {
+                        console.log("图片选择或拍照失败");
+                        return;
                     }
-
+                    const {value, index} = ret.data;
+                    const proportion = {};
+                    if (self.proportion.length === 0) {
+                        //表示不限制
+                    } else {
+                        proportion.aspectX = self.proportion[0];
+                        proportion.aspectY = self.proportion[1]
+                    }
+                    const {aspectX, aspectY} = proportion;
+                    let flag = index === 0;
+                    photo.capture(flag, true, {aspectX: aspectX, aspectY: aspectY}, (data) => {
+                        console.log("local path-> " + data);
+                        if (data === undefined || data === null) {
+                            weexUtils.toast("图片选择出现异常!");
+                            return;
+                        }
+                        self.uploadByNative(data);
+                    }, (message) => {
+                        weexUtils.toast(message);
+                    });
                 });
             },
-            uploadImage(event){
+            uploadImage(event) {
                 this.chooseImage();
             }
         },
-        created(){
+        beforeMount() {
+            console.log("this.rudius-> "+this.radius);
+            if (this.radius>0) {
+                this.uploadNativeStyle.borderRadius = this.radius + "px";
+            }
         }
     }
 

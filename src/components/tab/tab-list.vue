@@ -11,8 +11,7 @@
                 @changeTabItem="changeTabItem"
                 @changeTabIndex="changeTabIndex"></tab-item-header>
         <div v-if="web"
-             style="justify-content: flex-end;"
-             class="flex_cell">
+             class="view_wrapper flex_cell">
             <div v-for="(item,i) in tabList"
                  class="flex_cell"
                  :style="item.webStyle">
@@ -72,15 +71,6 @@
                         fontSize: "32px",
                         color: "#303030"
                     }
-                }
-            },
-            viewWrapperStyle: {
-                default: {
-                    top: "78px",
-                    left: "0px",
-                    right: "0px",
-                    bottom: "0px",
-                    backrgoundColor:"red"
                 }
             },
             useHeader: {default: true},

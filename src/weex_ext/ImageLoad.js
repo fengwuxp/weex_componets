@@ -7,16 +7,16 @@
  */
 if (weex.config.env.platform.toLowerCase() === 'web') {
     const imageWeexModal = {
-        loadImageInfo(url="",width=0,succ=()=>{
+        loadImageInfo(url="",width=-1,succ=()=>{
 
         },error=()=>{
 
         }){
-            console.log("web环境暂不支持 imageLoader");
+            //console.log("web环境暂不支持 imageLoader");
             // if(width===0||url.trim().length===0){
             //     return;
             // }
-            // succ();
+            succ({reqWidth:width, reqHeight:Math.round(Math.random()*width+500)});
         }
     };
     console.log("注册自定义模块 image");

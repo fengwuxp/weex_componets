@@ -44,19 +44,17 @@ export abstract class ApiQueryReq extends ApiReq {
 
 
     constructor(queryType: String ="QUERY_RESET" as String, queryPage: Number = 1, querySize: Number = 20,
-                orderBy: Array<String> = [], orderType: Array<String> = [], fromCache: Boolean = false,
-                total: Number = 0) {
+                orderBy: Array<String> = [], orderType: Array<String> = [], total: Number = 0,
+                fromCache?: Boolean ,) {
         super();
         this.queryType = queryType;
         this.queryPage = queryPage;
         this.querySize = querySize;
         this.orderBy = orderBy;
         this.orderType = orderType;
-        this.fromCache = fromCache;
         this.total = total;
+        this.fromCache = fromCache;
     }
-
-
 
 
 }

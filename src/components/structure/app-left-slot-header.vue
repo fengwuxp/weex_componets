@@ -1,4 +1,4 @@
-<!--带有背景图的顶部导航-->
+<!--带有背景图的 左侧为slot的 顶部导航-->
 <template>
     <div class="header_container" :style="containerStyle">
         <image :src="bgImageURL" class="bg_all" :style="bgImageStyle"></image>
@@ -6,13 +6,8 @@
         <div class="header" :style="headerStyle">
             <div @click="clickBackButton"
                  :style="leftStyle"
-                 class="left-back"
-                 v-if="backIconUrl.length>0">
-                <image :style="backStyle"
-                       :src="backIconUrl"></image>
-                <text v-if="leftText.length>0"
-                      :style="leftTextStyle"
-                      :value="leftText"></text>
+                 class="left-back">
+                <slot name="app-header-left"></slot>
             </div>
             <text class="title"
                   :style="titleStyle"
@@ -61,7 +56,6 @@
             },
             leftStyle: {
                 default: {
-                    width: "100px"
                 }
             },
             iosTopStyle:{
@@ -70,7 +64,6 @@
                     backgroundColor:"transparent"
                 }
             },
-            backIconUrl: {default: weexUtils.getResourcesURL(appHeaderConfig.backImage, weex)},
             backStyle:{
               default:{
                   width:"40px",

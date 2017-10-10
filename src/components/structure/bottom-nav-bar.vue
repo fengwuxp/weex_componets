@@ -36,10 +36,10 @@
         height: 100px;
         padding-left: 10px;
         padding-right: 10px;
-        background-color: #ffffff;
+        background-color: #fbfbfb;
         border-top-width: 1px;
         border-top-style:solid ;
-        border-top-color: #d2d2d2; ;
+        border-top-color: #d5d5d5; ;
     }
     .nav-item {
         flex: 1;

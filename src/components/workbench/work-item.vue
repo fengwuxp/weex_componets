@@ -2,7 +2,7 @@
 <template>
     <div class="workbench-item flex_center flex_cell" @click="clickItem">
         <image :src="icon" class="image_60"></image>
-        <text class="text_666 margin_top_20">{{text}}</text>
+        <text class="text-item margin_top_20">{{text}}</text>
     </div>
 </template>
 <script>
@@ -31,9 +31,9 @@
         flex: 1;
     }
 
-    .text_666 {
+    .text-item {
         font-size: 30px;
-        color: #666666;
+        color: #303030;
     }
     .image_60 {
         width: 60px;

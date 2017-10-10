@@ -4,7 +4,7 @@
               :style="scrollStyle"
               show-scrollbar="false"
               scroll-direction="horizontal">
-        <div class="flex_cell flex_center"
+        <div class="flex_center"
              v-for="(item,i) in items"
              :key="i"
              :ref="'item_header_'+i"
@@ -16,21 +16,24 @@
 </template>
 <script>
     import {dom} from "wxp_weex_componets/src/utils/ExportWeexModel";
+
     export default {
         props: {
             items: {default: []},
             scrollStyle: {
-                default:{
+                default: {
                     height: "80px",
-                    width:"750x",
-                    justifyContent:"flex-start"
+                    justifyContent: "flex-start",
+                    width: "750px",
+                    paddingLeft:"20px",
+                    paddingRight:"20px"
                 }
             },
             defaultStyle: {
                 default: {
                     container: {
                         backgroundColor: "#ffffff",
-                        flex:"1"
+                        flex: "1"
                     },
                     text: {
                         fontSize: "32px",
@@ -66,10 +69,11 @@
                     index: i,
                 });
 
-
-                let targetIndex = (i === 0 || i === this.items.length - 1) ? i : i - 1;
-                const el = this.$refs['item_header_' + targetIndex][0];
-                dom.scrollToElement(el);
+                if (this.items.length > 5) {
+                    let targetIndex = (i === 0 || i === this.items.length - 1) ? i : i - 1;
+                    const el = this.$refs['item_header_' + targetIndex][0];
+                    dom.scrollToElement(el);
+                }
             },
             /**
              *
@@ -84,7 +88,7 @@
                 this.items = Object.assign([], this.items);
             }
         },
-        created() {
+        beforeMount() {
             this.items.forEach((item, i) => {
                 if (i === this.selectedIndex) {
                     item.style = Object.assign({}, this.selectedStyle.container);
@@ -94,17 +98,6 @@
                     item.textStyle = Object.assign({}, this.defaultStyle.text);
                 }
             });
-
-//            //注册事件
-//            broadcast.register("tab_item_header","change",({data})=>{
-//                if(this.selectedIndex!==data){
-//                    this.changeStyle(this.selectedIndex,data);
-//                    this.$emit("changeTabIndex",{
-//                        currentIndex:this.selectedIndex,
-//                        index:data
-//                    });
-//                }
-//            });
         }
     }
 </script>
@@ -116,9 +109,5 @@
     .flex_center {
         justify-content: center;
         align-items: center;
-    }
-
-    .flex_cell {
-        flex: 1;
     }
 </style>

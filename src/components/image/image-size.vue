@@ -1,6 +1,6 @@
 <!--扩展weex的image能力 加入自适应布局功能-->
 <template>
-    <image v-if="show" :src="src" :style="style"></image>
+    <image v-if="show" @click="click" :src="src" :style="style"></image>
 </template>
 <script>
     import {imageLoader} from "wxp_weex_componets/src/utils/ExportWeexModel";
@@ -26,7 +26,9 @@
             };
         },
         methods: {
-
+            click(){
+                this.$emit("imageClick",{value:this.src});
+            },
             //固定比例
             fixedProportion() {
 
@@ -96,8 +98,3 @@
         }
     }
 </script>
-<style scoped>
-    .weex-image {
-        flex: 1;
-    }
-</style>
