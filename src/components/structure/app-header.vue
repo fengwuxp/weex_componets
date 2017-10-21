@@ -6,18 +6,22 @@
                 <image class="back" :src="backIconUrl"></image>
                 <text v-if="leftText" :style="leftTextStyle">{{leftText}}</text>
             </div>
-            <text class="title" :style="titleStyle" @click="clickText">{{title}}</text>
+            <text v-if="title.length>0"
+                  :style="titleStyle"
+                  @click="clickText"
+                  :value="title"></text>
             <text v-if="rightText.length>0"
+                  class="right-content"
                   @click="clickRight"
-                  class="right-text"
-                  :style="rightStyle"
+                  :style="rightTextStyle"
                   :value="rightText">
             </text>
             <image v-if="rightIcon.length>0"
+                   class="right-content"
                    @click="clickRight"
-                   :style="rightStyle"
-                   :src="rightIcon"
-                   class="right-icon"></image>
+                   :style="rightIconStyle"
+                   :src="rightIcon">
+            </image>
         </div>
     </div>
 </template>
@@ -32,10 +36,12 @@
         name: "app-header",
         props: {
             useBack: {default: true},
-            title: {default: ''},
+            title: {
+                default: ""
+            },
             rightText: {default: ""},
             rightIcon: {default: ""},
-            leftText: {defatul: ""},
+            leftText: {default: ""},
             leftTextStyle: {
                 default: {
                     fontSize: "32px",
@@ -57,7 +63,18 @@
             let result = appHeaderConfig.data;
             result.ios = false;
             return Object.assign({
-                backStyle: {height: "100px"}
+                backStyle: {height: "100px"},
+                rightTextStyle: {
+                    right: "15px",
+                    fontSize: "32px",
+                    color: ": #ffffff"
+                },
+                rightIconStyle: {
+                    right: "22px",
+                    top: "22px",
+                    width: " 56px",
+                    height: "56px"
+                }
             }, result);
         },
         methods: {
@@ -79,9 +96,12 @@
                 this.backStyle.height = this.style.height;
             }
             this.iosTopStyle = Object.assign({}, this.iosTopStyle, this.headerIosTopStyle);
-            this.titleStyle = Object.assign({}, this.titleStyle, this.headerTitleStyle);
-            this.rightStyle = Object.assign({}, this.rightStyle, this.headerRightStyle);
-
+            this.titleStyle = Object.assign({fontSize:"36px"}, this.titleStyle, this.headerTitleStyle);
+            if (this.rightText.length > 0) {
+                this.rightTextStyle = Object.assign({}, this.rightTextStyle, this.headerRightStyle);
+            } else {
+                this.rightIconStyle = Object.assign({}, this.rightIconStyle, this.headerRightStyle);
+            }
         }
     }
 </script>
@@ -96,7 +116,6 @@
         justify-content: center;
         align-items: center;
         position: relative;
-        font-size: 36px;
         border-bottom-width: 1px;
         border-bottom-style: solid;
 
@@ -116,24 +135,8 @@
         top: 0;
     }
 
-    .title {
-        font-size: 36px;
-    }
-
-    .right-text {
+    .right-content {
         position: absolute;
-        right: 15px;
-        top: 32px;
-        font-size: 32px;
-        color: #ffffff;
-    }
-
-    .right-icon {
-        position: absolute;
-        right: 25px;
-        top: 25px;
-        width: 50px;
-        height: 50px;
     }
 
 </style>

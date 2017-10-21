@@ -9,6 +9,13 @@ export interface Config {
      */
     ROOT_DOMAIN: string;
 
+
+    /**
+     * 图片服务域名
+     * @type {string}
+     */
+    PIC_SERVICE_DOMAIN: string;
+
     /**
      * 图片服务地址
      * @type {string}

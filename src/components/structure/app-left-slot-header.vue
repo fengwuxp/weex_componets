@@ -9,22 +9,24 @@
                  class="left-back">
                 <slot name="app-header-left"></slot>
             </div>
-            <text class="title"
+            <text v-if="title.length>0"
+                  class="title"
                   :style="titleStyle"
                   @click="clickText"
                   :value="title">
             </text>
             <text v-if="rightText.length>0"
+                  class="right-content"
                   @click="clickRight"
-                  class="right-text"
-                  :style="rightStyle"
+                  :style="rightTextStyle"
                   :value="rightText">
             </text>
             <image v-if="rightIcon.length>0"
+                   class="right-content"
                    @click="clickRight"
-                   :style="rightStyle"
-                   :src="rightIcon"
-                   class="right-icon"></image>
+                   :style="rightIconStyle"
+                   :src="rightIcon">
+            </image>
         </div>
     </div>
 </template>
@@ -41,43 +43,44 @@
             headerHeight: {
                 default: 100
             },
-            title: {default: ''},
-            titleStyle: {
-                default: appHeaderConfig.titleStyle
-            },
+            title: {default: ""},
             rightText: {default: ""},
             rightIcon: {default: ""},
-            leftText: {default: ""},
-            leftTextStyle: {
-                default: {
-                    fontSize: "32px",
-                    color: "#ffffff"
-                }
-            },
             leftStyle: {
+                default: {}
+            },
+            titleStyle: {
+                default: Object.assign({fontSize:"36px"},appHeaderConfig.titleStyle)
+            },
+
+            rightTextStyle: {
                 default: {
+                    right: "15px",
+                    fontSize: "32px",
+                    color: ": #ffffff"
                 }
             },
-            iosTopStyle:{
+            rightIconStyle: {
                 default: {
-                    height:"28px",
-                    backgroundColor:"transparent"
+                    right: "20px",
+                    top: "20px",
+                    width: " 60px",
+                    height: "60px"
                 }
             },
-            backStyle:{
-              default:{
-                  width:"40px",
-                  height:"40px",
-              }
+            iosTopStyle: {
+                default: {
+                    height: "28px",
+                    backgroundColor: "transparent"
+                }
             },
             bgImageStyle: {
                 default: {}
             },
-            bgImageURL: {default: weexUtils.getResourcesURL(appHeaderConfig.bagImageURL, weex)}
+            bgImageURL: {default: weexUtils.getResourcesURL(appHeaderConfig.bagImageURL, weex)},
         },
         data() {
             let ios = weex.config.env.platform.toLowerCase() === 'ios';
-
             return {
                 headerStyle: {},
                 containerStyle: {},
@@ -100,7 +103,7 @@
             let height = this.headerHeight;
             if (this.ios) {
                 height += this.iosTop;
-                this.bgImageURL=this.bgImageURL.replace("bg","ios-bg");
+                this.bgImageURL = this.bgImageURL.replace("bg", "ios-bg");
             }
             this.containerStyle = {
                 height: height + "px"
@@ -129,7 +132,6 @@
         justify-content: center;
         align-items: center;
         position: relative;
-        font-size: 36px;
     }
 
     .left-back {
@@ -137,24 +139,13 @@
         position: absolute;
         justify-content: center;
         align-items: center;
-        top:0;
+        top: 0;
         left: 0;
         bottom: 0;
     }
 
-    .right-text {
+    .right-content {
         position: absolute;
-        right: 15px;
-        font-size: 32px;
-        color: #ffffff;
-    }
-
-    .right-icon {
-        position: absolute;
-        right: 25px;
-        top: 25px;
-        width: 50px;
-        height: 50px;
     }
 
 </style>

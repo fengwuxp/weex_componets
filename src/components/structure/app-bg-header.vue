@@ -14,22 +14,24 @@
                       :style="leftTextStyle"
                       :value="leftText"></text>
             </div>
-            <text class="title"
+            <text v-if="title.length>0"
+                  class="title"
                   :style="titleStyle"
                   @click="clickText"
                   :value="title">
             </text>
             <text v-if="rightText.length>0"
+                  class="right-content"
                   @click="clickRight"
-                  class="right-text"
-                  :style="rightStyle"
+                  :style="rightTextStyle"
                   :value="rightText">
             </text>
             <image v-if="rightIcon.length>0"
+                   class="right-content"
                    @click="clickRight"
-                   :style="rightStyle"
-                   :src="rightIcon"
-                   class="right-icon"></image>
+                   :style="rightIconStyle"
+                   :src="rightIcon">
+            </image>
         </div>
     </div>
 </template>
@@ -64,23 +66,38 @@
                     width: "100px"
                 }
             },
-            iosTopStyle:{
+            iosTopStyle: {
                 default: {
-                    height:"28px",
-                    backgroundColor:"transparent"
+                    height: "28px",
+                    backgroundColor: "transparent"
                 }
             },
             backIconUrl: {default: weexUtils.getResourcesURL(appHeaderConfig.backImage, weex)},
-            backStyle:{
-              default:{
-                  width:"40px",
-                  height:"40px",
-              }
+            backStyle: {
+                default: {
+                    width: "40px",
+                    height: "40px",
+                }
             },
             bgImageStyle: {
                 default: {}
             },
-            bgImageURL: {default: weexUtils.getResourcesURL(appHeaderConfig.bagImageURL, weex)}
+            bgImageURL: {default: weexUtils.getResourcesURL(appHeaderConfig.bagImageURL, weex)},
+            rightTextStyle: {
+                default: {
+                    right: "15px",
+                    fontSize: "32px",
+                    color: ": #ffffff"
+                }
+            },
+            rightIconStyle: {
+                default: {
+                    right: "20px",
+                    top: "20px",
+                    width: " 60px",
+                    height: "60px"
+                }
+            }
         },
         data() {
             let ios = weex.config.env.platform.toLowerCase() === 'ios';
@@ -107,13 +124,12 @@
             let height = this.headerHeight;
             if (this.ios) {
                 height += this.iosTop;
-                this.bgImageURL=this.bgImageURL.replace("bg","ios-bg");
+                this.bgImageURL = this.bgImageURL.replace("bg", "ios-bg");
             }
             this.containerStyle = {
                 height: height + "px"
             };
             this.headerStyle.height = this.headerHeight + "px";
-
         }
     }
 </script>
@@ -144,24 +160,13 @@
         position: absolute;
         justify-content: center;
         align-items: center;
-        top:0;
+        top: 0;
         left: 0;
         bottom: 0;
     }
 
-    .right-text {
+    .right-content {
         position: absolute;
-        right: 15px;
-        font-size: 32px;
-        color: #ffffff;
-    }
-
-    .right-icon {
-        position: absolute;
-        right: 25px;
-        top: 25px;
-        width: 50px;
-        height: 50px;
     }
 
 </style>

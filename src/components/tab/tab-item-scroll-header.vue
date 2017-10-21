@@ -15,7 +15,7 @@
     </scroller>
 </template>
 <script>
-    import {dom} from "wxp_weex_componets/src/utils/ExportWeexModel";
+    import {dom} from "../../utils/ExportWeexModel";
 
     export default {
         props: {

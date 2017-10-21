@@ -3,13 +3,13 @@
     <image v-if="show" @click="click" :src="src" :style="style"></image>
 </template>
 <script>
-    import {imageLoader} from "wxp_weex_componets/src/utils/ExportWeexModel";
+    import {imageLoader} from "../../utils/ExportWeexModel";
 
     export default {
         props: {
-            width: {default: -1},   //期望宽度   -1表示自适应
-            height: {default: -1},  //期望高度
-            proportion: {default: -1},
+            width: {default: -1},      //期望宽度   -1表示自适应
+            height: {default: -1},     //期望高度
+            proportion: {default: -1}, //默认图片比例 -1表示自适应
             style: {
                 default: {}
             },
@@ -19,38 +19,35 @@
             }
         },
         data() {
-            let web = weex.config.env.platform.toLowerCase() === "web";
+            // let web = weex.config.env.platform.toLowerCase() === "web";
             return {
-                web,
+                //web,
                 show: false
             };
         },
         methods: {
-            click(){
-                this.$emit("imageClick",{value:this.src});
+            click() {
+                console.log("cliek -> ")
+                this.$emit("imageClick",this.src);
             },
             //固定比例
             fixedProportion() {
-
+                //TODO 图片按照固定比例显示
             },
-            setStyle({imageWidth, imageHeight}) {
-                console.log(this.style);
-
-                if (imageWidth === -1 && imageHeight === -1) {
-                    //wbe端
-                    this.show = true;
-                    return;
-                }
-
+            /**
+             * 设置图片大小
+             * @param imageWidth
+             * @param imageHeight
+             */
+            setSize({imageWidth, imageHeight}) {
                 if (this.width === -1 && this.height === -1) {
                     //自适应
-                    if (imageHeight > this.maxWidth) {
-                        //图片宽度超过最大允许宽度
+                    if (imageWidth <= this.maxWidth) {
+                        this.width = imageWidth;
+                    }else {
                         this.width = this.maxWidth;
                     }
                 }
-
-
                 let width, height, proportion;
                 if (this.height === -1) {
                     //指定宽度 高度自适应
@@ -67,27 +64,39 @@
                     width = this.width;
                     height = this.height;
                 }
-                this.style = Object.assign(this.style, {
+                this.setStyle({
                     width: width + "px",
                     height: height + "px"
                 });
+            },
+            /**
+             * 设置图片样式
+             * @param style
+             */
+            setStyle(style) {
+                this.style = Object.assign(this.style, style);
                 this.show = true;
-                console.log(this.style);
+                console.log("图片样式-> " + JSON.stringify(this.style));
             }
         },
         beforeMount() {
-//            if (this.src.trim().length === 0) {
-//                return;
-//            }
             this.width = parseInt(this.width);
+            this.maxWidth=parseInt(this.maxWidth)
             if (this.width > this.maxWidth) {
                 //最大宽度
                 this.width = this.maxWidth;
             }
-            //console.log(JSON.stringify(this.style));
+            this.height = parseInt(this.height);
+            if (this.width > 0 && this.height > 0) {
+                this.setStyle({
+                    width: this.width + "px",
+                    height: this.height + "px"
+                });
+                return;
+            }
             imageLoader.loadImageInfo(this.src, this.width, (map) => {
                 const {reqWidth, reqHeight} = map;
-                this.setStyle({
+                this.setSize({
                     imageWidth: reqWidth,
                     imageHeight: reqHeight
                 });

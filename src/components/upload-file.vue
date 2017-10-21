@@ -4,7 +4,7 @@
 
 <script>
     import GlobalApiConfig from "../api/config/GlobalAipConfig";
-    import weexUtils from "wxp_weex_componets/src/utils/WeexUtils";
+    import weexUtils from "../utils/WeexUtils";
 
     const actionSheet = weex.requireModule('actionSheet');
     const photo = weex.requireModule('photo');
@@ -13,7 +13,8 @@
     const nat_network_transfer = weex.requireModule('nat_network_transfer');
 
     //图片服务器地址
-    const picServiceURL = GlobalApiConfig.PIC_SERVICE_URL + "/common/picService/formUpload";
+    const PIC_SERVICE_URL = GlobalApiConfig.PIC_SERVICE_URL;
+    const PIC_SERVICE_DOMAIN = GlobalApiConfig.PIC_SERVICE_DOMAIN;
 
     export default {
         props: {
@@ -84,7 +85,7 @@
                 const self = this;
                 console.log("上传filePath：" + filePath);
                 nat_network_transfer.upload({
-                    url: picServiceURL,
+                    url: PIC_SERVICE_URL,
                     path: filePath
                 }, (result) => {
                     console.log("-result-> " + JSON.stringify(result));
@@ -110,7 +111,7 @@
                     const map = {};
                     result = {
                         orderNumber: self.orderNumber,
-                        url: GlobalApiConfig.PIC_SERVICE_URL + "/" + url
+                        url: PIC_SERVICE_DOMAIN+ url
                     }
                     console.log("map->  " + JSON.stringify(map));
                     self.$emit("uploadCallback", {
@@ -156,7 +157,7 @@
                     }
                     const {aspectX, aspectY} = proportion;
                     let flag = index === 0;
-                    photo.capture(flag, true, {aspectX: aspectX, aspectY: aspectY}, (data) => {
+                    photo.capture(flag, this.crop, {aspectX: aspectX, aspectY: aspectY}, (data) => {
                         console.log("local path-> " + data);
                         if (data === undefined || data === null) {
                             weexUtils.toast("图片选择出现异常!");

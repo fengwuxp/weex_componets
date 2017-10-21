@@ -3,49 +3,43 @@
     <image v-if="show" :src="backTopIcon" :style="backStyle" @click="backTop"></image>
 </template>
 <script>
-    import weexUtils from "wxp_weex_componets/src/utils/WeexUtils";
-    import {dom} from "wxp_weex_componets/src/utils/ExportWeexModel"
+    import weexUtils from "../utils/WeexUtils";
+    import {dom} from "../utils/ExportWeexModel"
 
     export default {
-        props:{
-            backTopIcon:{default:weexUtils.getResourcesURL("images/back_top_icon.png",weex)},
-            backStyle:{
-                default:{
-                    width:"60px",
-                    height:"60px",
-                    position:"fixed",
+        props: {
+            backTopIcon: {default: weexUtils.getResourcesURL("images/back_top_icon.png", weex)},
+            backStyle: {
+                default: {
+                    width: "80px",
+                    height: "80px",
+                    position: "fixed",
                 }
             },
-            position:{
-                default:{
-                    right:"40px",
-                    bottom:"150px"
+            position: {
+                default: {
+                    right: "35px",
+                    bottom: "120px"
                 }
             },
-            show:{default:false}
+            show: {default: false}
         },
-        data(){
-          return {
-          }
+        data() {
+            return {}
         },
-        methods:{
-            backTop(){
+        methods: {
+            backTop() {
                 let el = this.$parent.$refs['top_position'];
                 dom.scrollToElement(el);
                 this.$emit("backTop");
-                this.show = false;
             },
-            change(contentOffset){
+            change(contentOffset) {
                 const {y} = contentOffset;
-                if (y < 100) {
-                    this.show = true;
-                } else {
-                    this.show = false;
-                }
+                this.show = (y + 100) < 0;
             }
         },
-        beforeMount(){
-            this.backStyle=Object.assign(this.backStyle,this.position);
+        beforeMount() {
+            this.backStyle = Object.assign(this.backStyle, this.position);
         }
     }
 </script>

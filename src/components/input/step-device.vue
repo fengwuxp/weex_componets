@@ -20,8 +20,8 @@
     </div>
 </template>
 <script>
-    import weexUtils from "wxp_weex_componets/src/utils/WeexUtils";
-    import {timer} from "wxp_weex_componets/src/utils/ExportWeexModel";
+    import weexUtils from "../../utils/WeexUtils";
+    import {timer} from "../../utils/ExportWeexModel";
 
     const ADD_ICON_URL = weexUtils.getResourcesURL("images/storehome_icon_add@2x.png", weex);
     const ADD_ICON_DISABLED_URL = weexUtils.getResourcesURL("images/storehome_icon_add_disable@2x.png", weex);

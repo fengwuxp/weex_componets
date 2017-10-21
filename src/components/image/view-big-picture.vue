@@ -29,10 +29,10 @@
     </div>
 </template>
 <script>
-    import AppHeader from "wxp_weex_componets/src/components/structure/app-header.vue";
+    import AppHeader from "../structure/app-header.vue";
 
-    import {imageLoader} from "wxp_weex_componets/src/utils/ExportWeexModel";
-    import weexUtils from "wxp_weex_componets/src/utils/WeexUtils";
+    import {imageLoader} from "../../utils/ExportWeexModel";
+    import weexUtils from "../../utils/WeexUtils";
 
     export default {
         components: {AppHeader},

@@ -62,7 +62,7 @@
             let web = weex.config.env.platform.toLowerCase() === "web";
             let styleRefreshStyle={
                 flex:1
-            }
+            };
             if(web){
                 styleRefreshStyle.height="100%";
             }
@@ -88,18 +88,20 @@
             viewRefresh() {
                 this.showRefresh = true;
                 this.tipStatus = true;
-                this.viewRefreshAnimation(true);
+                this.viewRefreshAnimation();
                 this.$emit("refreshPage", () => {
-                    timer.setTimeout(() => {
-                        //结束动画
-                        this.viewRefreshAnimation(false);
-                        this.showRefresh = false;
-                        timer.setTimeout(() => {
-                            this.tipStatus = false;
-                        }, 200);
-                    }, 500);
+                    this.refreshEnd();
                 });
-
+            },
+            refreshEnd(){
+                timer.setTimeout(() => {
+                    //结束动画
+                    //this.viewRefreshAnimation();
+                    this.showRefresh = false;
+                    timer.setTimeout(() => {
+                        this.tipStatus = false;
+                    }, 200);
+                }, 500);
             },
             loadmore() {
                 this.$emit("loadmore");

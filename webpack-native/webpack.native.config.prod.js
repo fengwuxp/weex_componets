@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const nativeCOnfig = require("./webpack.native.config");
+const envConfig = require("../../../webpack-config/WebpackConfig");
 
 nativeCOnfig.plugins.unshift(new UglifyJsPlugin({
     // 最紧凑的输出
@@ -17,6 +18,11 @@ nativeCOnfig.plugins.unshift(new UglifyJsPlugin({
         collapse_vars: true,
         // 提取出出现多次但是没有定义成变量去引用的静态值
         reduce_vars: true,
+    }
+}), new webpack.DefinePlugin({
+    'process.env': {
+        NODE_ENV: '"prod"',
+        API_ROOT: JSON.stringify(envConfig.PROD_API_ADDRESS)
     }
 }));
 

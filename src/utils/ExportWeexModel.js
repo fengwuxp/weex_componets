@@ -11,6 +11,8 @@ import  "../weex_ext/Picker";
 import  "../weex_ext/Timer";
 import  "../weex_ext/Common";
 import  "../weex_ext/AppUpdate";
+import  "../weex_ext/Photo";
+import  "../weex_ext/Location";
 
 const weexModule=weex;
 //weex官方提供的模块
@@ -36,6 +38,9 @@ const msgPush=weex.requireModule("msgPush");
 const qrcode=weex.requireModule("qrcode");
 const common=weex.requireModule("common");
 const appUpdate=weex.requireModule("appUpdate");
+const photo=weex.requireModule("photo");
+const location=weex.requireModule("location");
+
 //此处为了导入地方能够进行结构赋值，不能使用 export default
 export  {
     weexModule,
@@ -58,5 +63,7 @@ export  {
     msgPush,
     qrcode,
     common,
-    appUpdate
+    appUpdate,
+    photo,
+    location
 };

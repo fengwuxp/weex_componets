@@ -1,28 +1,29 @@
 <!--下拉刷新视图-->
 <template>
-    <div>
-        <scroller :style="listStyle"
-                  :loadmoreoffset="loadmoreoffset"
-                  @scroll="viewScroll"
-                  @loadmore="loadmore"
-                  show-scrollbar="false">
-            <refresh class="flex_row" :style="refreshContainerStyle"
-                     @refresh="viewRefresh"
-                     @pullingdown="viewOnPullingDown"
-                     :display="showRefresh ? 'show' : 'hide'">
-                <div class="flex_row flex_v_center" :style="refreshContentStyle">
-                    <image :src="images[currentAnimationFrame]" :style="imageStyle"></image>
-                    <div v-if="refreshTitle.length>0 && pullDownTipText.length>0 ">
-                        <text class="loading_text" v-if="refreshTitle.length>0">{{refreshTitle}}</text>
-                        <text class="loading_text" v-if="tipStatus===false">{{pullDownTipText}}</text>
-                        <text class="loading_text" v-if="tipStatus">{{refreshTipText}}</text>
-                    </div>
+    <!--<div style="flex:1;">-->
+    <!---->
+    <!--<slot name="drop-no-scroller"></slot>-->
+    <!--</div>-->
+    <scroller :style="listStyle"
+              :loadmoreoffset="loadmoreoffset"
+              @scroll="viewScroll"
+              @loadmore="loadmore"
+              show-scrollbar="false">
+        <refresh class="flex_row" :style="refreshContainerStyle"
+                 @refresh="viewRefresh"
+                 @pullingdown="viewOnPullingDown"
+                 :display="showRefresh ? 'show' : 'hide'">
+            <div class="flex_row flex_v_center" :style="refreshContentStyle">
+                <image :src="images[currentAnimationFrame]" :style="imageStyle"></image>
+                <div v-if="refreshTitle.length>0 && pullDownTipText.length>0 ">
+                    <text class="loading_text" v-if="refreshTitle.length>0">{{refreshTitle}}</text>
+                    <text class="loading_text" v-if="tipStatus===false">{{pullDownTipText}}</text>
+                    <text class="loading_text" v-if="tipStatus">{{refreshTipText}}</text>
                 </div>
-            </refresh>
-            <slot></slot>
-        </scroller>
-        <slot name="drop-no-scroller"></slot>
-    </div>
+            </div>
+        </refresh>
+        <slot></slot>
+    </scroller>
 </template>
 <script>
     import tabbarPage from '../mixins/TabbarPage';
@@ -87,15 +88,18 @@
                 this.tipStatus = true;
                 this.viewRefreshAnimation(true);
                 this.$emit("refreshPage", () => {
-                    timer.setTimeout(() => {
-                        //结束动画
-                        this.viewRefreshAnimation(false);
-                        this.showRefresh = false;
-                        timer.setTimeout(() => {
-                            this.tipStatus=false;
-                        }, 200);
-                    }, 500);
+                    this.refreshEnd();
                 });
+            },
+            refreshEnd(){
+                timer.setTimeout(() => {
+                    //结束动画
+                    //this.viewRefreshAnimation();
+                    this.showRefresh = false;
+                    timer.setTimeout(() => {
+                        this.tipStatus = false;
+                    }, 200);
+                }, 500);
             },
             loadmore(){
                 this.$emit("loadmore");
