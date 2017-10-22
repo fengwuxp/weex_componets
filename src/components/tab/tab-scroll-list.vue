@@ -30,14 +30,12 @@
                 :index="selectedIndex"
                 @change="changeSlider"
                 class="view_wrapper flex_cell">
-            <div class="flex_cell"
-                 v-for="(item,i) in tabList"
-                 :key="i">
-                <embed class="view_content w_750"
-                       :src="item.src"
-                       :style="item.style"
-                       type="weex"></embed>
-            </div>
+            <embed v-for="(item,i) in tabList"
+                   :key="i"
+                   class="view_content"
+                   :src="item.src"
+                   :style="item.style"
+                   type="weex"></embed>
         </slider>
     </div>
 </template>
@@ -145,9 +143,6 @@
         flex: 1;
     }
 
-    .w_750{
-        width: 750px;
-    }
     .view_wrapper {
         justify-content: flex-end;
     }
