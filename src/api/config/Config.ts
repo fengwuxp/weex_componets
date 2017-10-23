@@ -70,4 +70,10 @@ export interface Config {
      */
     APP_FOOTER_CONFIG:any;
 
+
+    /**
+     * ios项目名称，在切换远程和本地js是需要用来判别是否是从本地的目录加载的一个标识
+     */
+    IOS_PROJECT_NAME:string
+
 }

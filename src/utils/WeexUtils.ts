@@ -2,7 +2,7 @@ import {isNullOrUndefined} from "util";
 import {storage, modal, cache, timer} from './ExportWeexModel.js';
 import EnumProxyFactory from "./EnumProxyFactory";
 import "./PromiseExt";
-import  GlobalApiConfig from "../api/config/GlobalAipConfig";
+import GlobalApiConfig from "../api/config/GlobalAipConfig";
 
 
 /**
@@ -30,7 +30,7 @@ class WeexUtils {
      */
     getResourcesURL(uri: String, weex: any) {
         //return GlobalConfig.DOMAIN + uri + "?123";
-        const basePath = this.getBasePath(weex).replace(GlobalApiConfig.WEB_DEPLOYMENT_DIRECTORY+"/", "");
+        const basePath = this.getBasePath(weex).replace(GlobalApiConfig.WEB_DEPLOYMENT_DIRECTORY + "/", "");
         return basePath + uri;
     }
 
@@ -48,9 +48,9 @@ class WeexUtils {
         if (isAndroidAssets) {
             nativeBase = 'file://assets/js/';
         } else if (isiOSAssets) {
-            nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf('WeexDemo.app/')) + "WeexDemo.app/bundlejs/";
+            nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf(GlobalApiConfig.IOS_PROJECT_NAME + '/')) + GlobalApiConfig.IOS_PROJECT_NAME + "/bundlejs/";
         } else {
-            let host = GlobalApiConfig.BASE_DOMAIN + '/weex/'+GlobalApiConfig.WEB_DEPLOYMENT_DIRECTORY+'/';
+            let host = GlobalApiConfig.BASE_DOMAIN + '/weex/' + GlobalApiConfig.WEB_DEPLOYMENT_DIRECTORY + '/';
             nativeBase = 'http://' + host;
         }
 
@@ -71,7 +71,7 @@ class WeexUtils {
             useFooter: true,
             headerHeight: weex.config.env.platform.toLowerCase() === "ios" ? "128px" : "100px",
             footerHeight: "83px",
-            scrollerStyle:{flex:"1"}
+            scrollerStyle: {flex: "1"}
         };
 
         return Object.assign(config, view);

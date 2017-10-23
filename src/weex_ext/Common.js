@@ -28,7 +28,15 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
         }, fail = () => {
         }) {
             console.log("web环境暂不支持 getAppVersionInfo");
-        }
+        },
+
+        /**
+         * 设置安卓顶部状态栏背景色
+         * @param color
+         */
+        // setGlobalTopStatusBar(color){
+        //     console.log("仅支持android环境!");
+        // }
 
 
     };
