@@ -44,7 +44,7 @@ class WeexUtils {
         //console.log("-bundleUrl->"+bundleUrl);
         let nativeBase;
         let isAndroidAssets = bundleUrl.indexOf('file://assets/') >= 0;
-        let isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
+        let isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf(GlobalApiConfig.IOS_PROJECT_NAME) > 0;
         if (isAndroidAssets) {
             nativeBase = 'file://assets/js/';
         } else if (isiOSAssets) {
