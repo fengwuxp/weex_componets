@@ -1,4 +1,3 @@
-
 /**
  * 自定义common 模块
  */
@@ -11,7 +10,9 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          * @param succ
          * @param fail
          */
-        openApp(packageName,downloadURL,succ=()=>{},fail=()=>{}){
+        openApp(packageName, downloadURL, succ = () => {
+        }, fail = () => {
+        }) {
             console.log("web环境暂不支持 openApp");
         },
         /**
@@ -26,8 +27,10 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
         getAppVersionInfo(succ = () => {
         }, fail = () => {
         }) {
-
+            console.log("web环境暂不支持 getAppVersionInfo");
         }
+
+
     };
     console.log("注册自定义模块 common");
     weex.registerModule('common', commonModal);

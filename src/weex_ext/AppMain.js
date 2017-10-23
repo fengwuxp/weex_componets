@@ -9,14 +9,14 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          * @param autoHideSeconds
          * @param callback
          */
-        showProgressBar(autoHideSeconds, callback){
+        showProgressBar(autoHideSeconds, callback) {
 
             console.log("进度开始!")
         },
         /**
          * 隐藏加载进度
          */
-        hideProgressBar(){
+        hideProgressBar() {
             console.log("进度结束!")
         },
         /**
@@ -24,10 +24,10 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          * @param callback
          */
         getNetworkType(callback = () => {
-        }){
+        }) {
+            console.log("web环境暂不支持 getNetworkType");
             callback(true);
         },
-
         /**
          * 打开原生页面
          * @param actionType  动作类型
@@ -37,14 +37,14 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          */
         openActivity(actionType, params = {}, succ = () => {
         }, error = () => {
-        }){
+        }) {
             console.log("这里是web端!，不处理openActivity方法!");
         },
 
         /**
          * 获取登录用户
          */
-        getLoginUser(params, callback, failFn){
+        getLoginUser(params, callback, failFn) {
             console.log("浏览器暂使用模拟数据");
             callback({id: 152});
         },
@@ -56,7 +56,7 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          */
         toMine(success = () => {
         }, failre = () => {
-        }){
+        }) {
             console.log("浏览器暂不支持改方法");
         },
 
@@ -67,7 +67,7 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          */
         toCart(success = () => {
         }, failre = () => {
-        }){
+        }) {
             console.log("浏览器暂不支持改方法");
         },
 
@@ -78,7 +78,7 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          */
         toCategory(success = () => {
         }, failre = () => {
-        }){
+        }) {
             console.log("浏览器暂不支持改方法");
         },
 
@@ -89,7 +89,7 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          */
         toHome(success = () => {
         }, failre = () => {
-        }){
+        }) {
             console.log("浏览器暂不支持改方法");
         },
 
@@ -100,7 +100,7 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          */
         toOrder(success = () => {
         }, failre = () => {
-        }){
+        }) {
             console.log("浏览器暂不支持改方法");
         },
 
@@ -110,9 +110,9 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          * @param success
          * @param failre
          */
-        share(params={},success = () => {
+        share(params = {}, success = () => {
         }, failre = () => {
-        }){
+        }) {
             console.log("浏览器暂不支持改方法");
         },
 
@@ -123,7 +123,9 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          * @param succ
          * @param failre
          */
-        callPhone(flag,mobilePhone,succ=()=>{},failre=()=>{}){
+        callPhone(flag, mobilePhone, succ = () => {
+        }, failre = () => {
+        }) {
             console.log("浏览器暂不支持改方法");
         }
 
