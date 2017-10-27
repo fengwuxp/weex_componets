@@ -81,8 +81,8 @@ class ApiClientWeex extends ApiClientInterface<WeexStreamOption> {
 
         const sign = this.sign(option.signFields, option.data);  //获取签名字符串
 
-        console.log(" ReqMethod--> " + ReqMethod[option.method])
-        console.log(" DataType--> " + DataType[option.type])
+        // console.log(" ReqMethod--> " + ReqMethod[option.method])
+        // console.log(" DataType--> " + DataType[option.type])
 
         if (option.method === ReqMethod.POST || option.type === DataType.JSONP) {
             option.data['sign'] = sign;      //签名字符串
