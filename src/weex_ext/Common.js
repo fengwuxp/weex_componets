@@ -31,6 +31,16 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
         },
 
         /**
+         * 设置页面激活回调
+         * @param callback
+         */
+        setOnActCallback(callback=()=>{}){
+            console.log("web环境暂不支持 setOnActCallback");
+        },
+
+
+
+        /**
          * 设置安卓顶部状态栏背景色
          * @param color
          */

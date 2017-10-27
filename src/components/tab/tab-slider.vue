@@ -1,172 +1,167 @@
-<!--原生 自定义 slider-->
 <template>
-    <div class="slider_wrapper" :style="containerStyle">
-        <div class="slider_container"
-             v-on:touchstart="slideStart"
-             v-on:touchend="slideEnd"
-             v-on:touchmove="slideMove"
-             :style="slierStyle">
-            <div v-for="(item,i) in items"
-                 class="slider_item"
-                 :ref="'item_'+i"
-                 :style="item.style">
-                <slot :name="'slider_item_'+i"></slot>
+    <div class="flex_cell">
+        <tab-item-header
+                v-if="useHeader"
+                ref="tab_item_eader"
+                style="justify-content: flex-start"
+                :items="items"
+                :defaultStyle="defaultStyle"
+                :selectedStyle="selectedStyle"
+                :selectedIndex="selectedIndex"
+                @changeTabItem="changeTabItem"
+                @changeTabIndex="changeTabIndex"></tab-item-header>
+        <div v-if="web"
+             class="view_wrapper flex_cell">
+            <div v-for="(item,i) in tabList"
+                 class="flex_cell"
+                 :style="item.webStyle">
+                <slot :name="'tab_item'+i"></slot>
             </div>
         </div>
+        <!--<div v-if="!web"-->
+        <!--class="view_wrapper flex_cell">-->
+        <!--<embed class="view_content"-->
+        <!--v-for="(item,i) in tabList"-->
+        <!--:src="item.src"-->
+        <!--:style="item.style"-->
+        <!--type="weex"></embed>-->
+        <!--</div>-->
+        <slider v-if="!web"
+                ref="tap_list"
+                :infinite="infinite"
+                :index="selectedIndex"
+                :style="tabListStyle"
+                @change="changeSlider"
+                class="view_wrapper flex_cell">
+            <embed v-for="(item,i) in tabList"
+                   :key="i"
+                   class="view_content"
+                   :src="item.src"
+                   :style="item.style"
+                   type="weex"></embed>
+        </slider>
     </div>
 </template>
 <script>
+    import TabItemHeader from "./tab-item-header.vue";
 
+    const defWebStyle = {display: "block", height: "100%"};
+    const hideWebStyle = {display: "none", height: "100%"};
+    const defStyle = {visibility: "visible"};
+    const hideStyle = {visibility: "hidden"};
     export default {
+        components: {TabItemHeader},
+        mixins: [],
         props: {
-            showIndex: {default: 0},
-            width: {
-                default: 750
+            tabList: {default: []},
+            items: {default: []},
+            tabListStyle: {
+                default: {
+                    width: "750px"
+                }
             },
-            height: {
-                default: ""
+            defaultStyle: {
+                default: {
+                    container: {
+                        backgroundColor: "#e6e6e6",
+                        paddingTop: "20px",
+                        paddingBottom: "20px",
+                        borderBottomWidth: "0px",
+                        borderBottomColor: "green",
+                        borderBottomStyle: "solid"
+                    },
+                    text: {
+                        fontSize: "32px",
+                        color: "#303030"
+                    }
+                },
             },
-            size: {
-                defualt: 0
-            }
+            selectedStyle: {
+                default: {
+                    container: {
+                        backgroundColor: "#ffffff",
+                        paddingTop: "20px",
+                        paddingBottom: "15px",
+                        borderBottomWidth: "5px",
+                        borderBottomColor: "green",
+                        borderBottomStyle: "solid"
+                    },
+                    text: {
+                        fontSize: "32px",
+                        color: "#303030"
+                    }
+                }
+            },
+            useHeader: {default: true},
+            selectedIndex: {default: 0}
         },
         data() {
-            let deviceWidth = weex.config.env.deviceWidth;
-            let rpx = deviceWidth / 750.0;
+            let web = weex.config.env.platform.toLowerCase() === "web";
+            //web=false;
             return {
-                coordinate: {
-                    startX: 0,
-                    endX: 0
-                },
-                containerStyle: {
-                    width: "750px",
-                },
-                slierStyle: {
-                    left: "0px",
-                    right: "0px",
-                    top: "0px",
-                    bottom: "0px"
-                },
-                rpx,
-                currentIndex: 0,
-                minLeft: 0,
-                items: []
-            }
+                web,
+                removeHeight: 180,
+                infinite: false
+            };
         },
         methods: {
-            slideStart({changedTouches}) {
-                const {screenX} = changedTouches[0];
-                let left = this.coordinateConversion(screenX);
-                this.coordinate.startX = left;
-            },
-            slideMove({changedTouches}) {
-                this.setCoordinate(changedTouches[0]);
-                let num = this.coordinate.endX - this.coordinate.startX;
-                this.moveSlider(num);
-            },
-            slideEnd({changedTouches}) {
-                this.setCoordinate(changedTouches[0]);
-                let num = this.coordinate.endX - this.coordinate.startX;
-                let minDistance = this.width / 3;
-                let index = this.currentIndex;
-                if (num > 0) {
-                    //向右滑动
-                    if (num >= minDistance) {
-                        //移动超过三分之一
-                        index = index - 1;
-                    }
+            changeTabItem({currentIndex, index}) {
+                if (this.web) {
+                    this.tabList[this.selectedIndex].webStyle = hideWebStyle;
+                    this.tabList[index].webStyle = defWebStyle;
                 } else {
-                    //向左滑动
-                    if (num <= -minDistance) {
-                        //移动超过三分之一
-                        index = index + 1;
-                    }
+                    this.tabList[this.selectedIndex].style = hideStyle;
+                    this.tabList[index].style = defStyle;
                 }
-                this.changeTab(index);
+                this.tabList = Object.assign([], this.tabList);
+                this.changeTabIndex({currentIndex, index})
+            },
+            changeTabIndex({currentIndex, index}) {
+                this.selectedIndex = index;
             },
             /**
-             * 改变slider tab
-             **/
-            changeTab(index) {
-                if (index < 0) {
-                    index = 0;
-                }
-                if (index > this.size) {
-                    index = this.size;
-                }
-                let changeNum = this.currentIndex - index;
-                let num = changeNum * this.width;
-                this.moveSlider(num);
-                if (this.currentIndex !== index) {
-                    this.currentIndex = index;
-                    this.$emit("changeSlider", {index: index});
-                }
-            },
-            moveSlider(num) {
-                let left = -this.currentIndex * this.width;
-
-                left += parseInt(num);
-                if (left > 0) {
-                    left = 0;
-                }
-                if (left < this.minLeft) {
-                    left = this.minLeft;
-                }
-                this.slierStyle.left = left + "px";
-            },
-
-            setCoordinate({screenX}) {
-                let left = this.coordinateConversion(screenX);
-                this.coordinate.endX = left;
-            },
-
-            /**
-             * 坐标换算
+             * 改变slider
+             * @param index
              */
-            coordinateConversion(val) {
-
-                return val / this.rpx;
+            changeSlider({index}) {
+                this.$refs['tab_item_eader'].changeTab(index);
+                console.log("使用ref调用");
             }
         },
+        mounted() {
+
+        },
         beforeMount() {
-            let length = this.size
-
-            for (let i = 0; i < length; i++) {
-                let item = {
-                    style:{}
-                };
-                item.style.width = this.width + "px";
-                item.style.left = i * this.width + "px";
-                item.style.top = "0px";
-                this.items[i] = item;
-            }
-            console.log(this.items)
-
-            this.containerStyle.width = this.width + "px";
-            if (this.height) {
-                this.containerStyle.height = this.height + "px";
-            } else {
-                this.containerStyle.flex = "1";
-            }
-
-            this.slierStyle.width = this.width * length + "px";
-            this.minLeft = -(length - 1) * this.width;
-            if (this.showIndex !== 0) {
-                this.changeTab(this.showIndex);
-            }
+            //初始化数据
+            this.tabList.forEach((item, i) => {
+                if (this.selectedIndex === i) {
+                    item.webStyle = defWebStyle;
+                    item.style = defStyle;
+                } else {
+                    item.webStyle = hideWebStyle;
+                    item.style = hideStyle
+                }
+            });
+            let index = parseInt(this.selectedIndex);
+            this.changeTabItem({currentIndex: 0, index});
         }
+
     }
 </script>
 <style scoped>
-    .slider_wrapper {
-        position: relative;
+    .flex_cell {
+        flex: 1;
     }
 
-    .slider_container {
-        position: absolute;
+    .view_wrapper {
+        justify-content: flex-end;
     }
 
-    .slider_item {
+    .view_content {
         position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
     }
 </style>

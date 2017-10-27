@@ -23,6 +23,22 @@ if (weex.config.env.platform.toLowerCase() === 'web') {
          */
         registerMsgPush(accountId, success = () => {}, failure = () => {}){
             console.log(accountId);
+        },
+
+        /**
+         * 查询消息
+         * @param callback
+         */
+        queryMsg(callback=()=>{}){
+            console.log("web环境暂不支持 queryMsg");
+        },
+        /**
+         * 读取消息
+         * @param msgId  消息
+         * @param callback
+         */
+        readMsg(msgId,callback=()=>{}){
+            console.log("web环境暂不支持 readMsg");
         }
     };
     console.log("注册自定义模块 msgPush");

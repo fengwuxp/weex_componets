@@ -1,11 +1,17 @@
-<!--带背景图的底部导航条-->
+<!--带背景图和icon数值标记的的底部导航条-->
 <template>
     <div class="bottom_nav_container" :style="navStsyle">
-        <image :src="navBgImage" class="nav_bg"></image>
+        <image v-if="navBgImage" :src="navBgImage" class="nav_bg"></image>
         <div class="nav_list">
             <div v-for="(item,index) in navItems" class="nav-item" @click="navItemOnClick(index)">
                 <image class="nav-item-image" :src="item.icon"></image>
                 <text class="nav-item-text" :style="item.textColor">{{item.text}}</text>
+                <text class="number-icon"
+                      v-if="item.number>0 && item.number<=99"
+                      :value="item.number"></text>
+                <text class="number-icon"
+                      v-if="item.number>99"
+                      :value="item.number">...</text>
             </div>
         </div>
     </div>
@@ -40,7 +46,7 @@
     .bottom_nav_container {
         flex-direction: row;
         justify-content: flex-end;
-        height: 100px;
+        height: 120px;
         background-color: transparent;
         position: relative;
     }
@@ -58,9 +64,9 @@
 
     .nav-item {
         flex: 1;
-        height: 100px;
         justify-content: center;
         align-items: center;
+        position: relative;
     }
 
     .nav-item-image {
@@ -75,5 +81,26 @@
 
     .nav_bg {
         flex: 1;
+        max-height: 100px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: 20px;
+    }
+
+    .number-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+        border-radius: 40px;
+        background-color: red;
+        color: #ffffff;
+        text-align: center;
+        line-height: 40px;
+        font-weight: 700;
+        position: absolute;
+        right: 36px;
+        top: 7px;
     }
 </style>

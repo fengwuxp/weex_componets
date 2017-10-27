@@ -4,7 +4,6 @@ import commonUtils from "../utils/CommonUtils";
 import {navigator} from "../utils/ExportWeexModel";
 
 
-
 let packageName = weex.config.env.appGroup;
 if (packageName === null || packageName === undefined || packageName.toString().trim().length === 0) {
     packageName = weex.config.env.appName;
@@ -12,7 +11,7 @@ if (packageName === null || packageName === undefined || packageName.toString().
 
 
 export default {
-    data(){
+    data() {
         let platform = weex.config.env.platform;
         let isIos = platform.toLowerCase() === 'ios';
         let newNavigator = navigator;
@@ -67,7 +66,7 @@ export default {
          * @param isPopSelf 是否清除自身url(仅支持原生)
          * @param callback 回调函数(仅支持原生)
          */
-        jump (url = "", params = {}, isPopSelf = false, callback = () => {
+        jump(url = "", params = {}, isPopSelf = false, callback = () => {
         }) {
             if (!this.web) {
                 let routerKey = url.split("?")[0].substr(1, url.length);
@@ -103,11 +102,11 @@ export default {
                     let split = route.path.split(":");
                     let paramsKey = split[1];
                     let value = url.replace(split[0], "");
-                    let p={};
-                    p[paramsKey]=value;
-                    params=Object.assign({},params,p);
+                    let p = {};
+                    p[paramsKey] = value;
+                    params = Object.assign({}, params, p);
                 }
-                this.openWeexByNative(gotoURL,main,params,callback);
+                this.openWeexByNative(gotoURL, main, params, callback);
                 if (isPopSelf && this.android) {
                     //清除自己的堆栈，防止点击返回时回到该页面
                     console.log("清除自己的堆栈，防止点击返回时回到该页面");
@@ -140,15 +139,20 @@ export default {
          * @param params
          * @param callback
          */
-        openWeexByNative(url,main=false, params = {}, callback = () => {}){
+        openWeexByNative(url, main = false, params = {}, callback = () => {
+        }) {
             if (url.indexOf("?") < 0) {
                 url += "?";
             }
+            let i = 0;
             //构建参数
             for (let key in params) {
                 url += key + "=" + params[key] + "&";
+                i++;
             }
-            url = url.substr(0, url.length - 1);
+            if (i > 0) {
+                url = url.substr(0, url.length - 1);
+            }
             let gotoURL = "weex://" + packageName + (main ? "/main/" : "/page/") + url;
             this.newNavigator.push({
                 url: gotoURL,
@@ -163,7 +167,7 @@ export default {
          * @param useQuery 是否使用查询字符串参数
          * @return {*}
          */
-        getParams(keys, useQuery = true){
+        getParams(keys, useQuery = true) {
             let params = {};
             let length = keys.length;
             if (!this.web) {
@@ -201,7 +205,7 @@ export default {
          * @param uri  非必填，若传入则放回完整url
          * @return String
          */
-        getBasePath(uri = null){
+        getBasePath(uri = null) {
             let basePath = weexUtils.getBasePath(weex);
             if (uri === null) {
                 return basePath;
@@ -214,7 +218,7 @@ export default {
          * 点击底部导航
          * @param navItem
          */
-        bottomNavOnclick(navItem){
+        bottomNavOnclick(navItem) {
             this.jump(navItem.url);
         }
     }

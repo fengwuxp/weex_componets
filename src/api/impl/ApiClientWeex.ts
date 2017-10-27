@@ -6,12 +6,13 @@ import requestURLIsNeedToken from "../option/NotTokenURLConfig";
 import {DataType} from "../base/DataType";
 import {ApiClientInterface} from "../base/ApiClientInterface";
 import ApiConfig from "../base/ApiConfig";
-import {stream, appMain} from "../../utils/ExportWeexModel.js";
+import {stream, appMain, weexModule} from "../../utils/ExportWeexModel.js";
 import weexUtils from "../../utils/WeexUtils";
 import memberUtils from "../../../../../src/utils/MemberUtils";
 
-import  GlobalApiConfig from "../config/GlobalAipConfig";
+import GlobalApiConfig from "../config/GlobalAipConfig";
 
+const IS_WEB = weexModule.config.env.platform.toLowerCase() === "web";
 
 /**
  * 请求服务端的api统一接口失效
@@ -57,27 +58,31 @@ class ApiClientWeex extends ApiClientInterface<WeexStreamOption> {
      */
     fetch(option: WeexStreamOption): any {
 
-        if (GlobalApiConfig.GLOBAL_USER_DATA_TYPE_JSONP) {
+        if (GlobalApiConfig.GLOBAL_USER_DATA_TYPE_JSONP && IS_WEB) {
             //全局开启jsonp
             option.type = DataType.JSONP;
         }
 
+
         //添加查询参数的处理
         let queryPrams = option.queryPrams;
-        if(!isNullOrUndefined(queryPrams) && Object.keys(queryPrams).length>0){
+        if (!isNullOrUndefined(queryPrams) && Object.keys(queryPrams).length > 0) {
             if (option.url.indexOf("?") >= 0) {
                 option.url += "&";
             } else {
                 option.url += "?"
             }
-            for(let key in queryPrams){
-                option.url+=key+"="+queryPrams[key];
+            for (let key in queryPrams) {
+                option.url += key + "=" + queryPrams[key];
             }
         }
 
         option.data = isUndefined(option.data) ? {} : option.data;
 
         const sign = this.sign(option.signFields, option.data);  //获取签名字符串
+
+        console.log(" ReqMethod--> " + ReqMethod[option.method])
+        console.log(" DataType--> " + DataType[option.type])
 
         if (option.method === ReqMethod.POST || option.type === DataType.JSONP) {
             option.data['sign'] = sign;      //签名字符串
@@ -112,10 +117,10 @@ class ApiClientWeex extends ApiClientInterface<WeexStreamOption> {
             option.url += "&data=" + JSON.stringify(option.data);  //URL encode
         }
 
-        // console.log("请求url--> " + option.url);
+        //console.log("请求url--> " + option.url);
         // console.log("请求method--> " + ReqMethod[option.method]);
-        // console.log("请求headers--> " + option.headers);
-        // console.log("请求params--> " + JSON.stringify(option.data));
+        //console.log("请求headers--> " + JSON.stringify(option.headers));
+        //console.log("请求params--> " + JSON.stringify(option.data));
         // console.log("请求的结果数据类型：" + DataType[option.type].toLowerCase());
 
         option.type = isUndefined(option.type) ? DataType.JSON : option.type;
@@ -127,7 +132,7 @@ class ApiClientWeex extends ApiClientInterface<WeexStreamOption> {
         this.client.fetch({
             method: ReqMethod[option.method],               //请求方法get post
             url: option.url,                      //请求url
-            type:"json", //DataType[option.type].toLowerCase(),                    //响应类型, json,text 或是 jsonp {在原生实现中其实与 json 相同)
+            type: "json", //DataType[option.type].toLowerCase(),                    //响应类型, json,text 或是 jsonp {在原生实现中其实与 json 相同)
             headers: headers,             //headers HTTP 请求头
             body: option.data == null ? "" : JSON.stringify(option.data)     //参数仅支持 string 类型的参数，请勿直接传递 JSON，必须先将其转为字符串。请求不支持 body 方式传递参数，请使用 url 传参。
         }, function (response) {
@@ -214,13 +219,13 @@ class ApiClientWeex extends ApiClientInterface<WeexStreamOption> {
 
             //判断是否需要登陆
             const isNeedToken = requestURLIsNeedToken(config.url);
-            console.log("是否需要token-> "+isNeedToken);
+            console.log("是否需要token-> " + isNeedToken);
             if (!isNeedToken) {
                 this.request(reject, options);
             } else {
                 memberUtils.getCurrentLoginMember().then((memberInfo) => {
                     let token = memberInfo['token'];
-                    if(isNullOrUndefined(token)){
+                    if (isNullOrUndefined(token)) {
                         throw new Error("获取token失败!");
                     }
                     if (token.length > 0) {
@@ -303,4 +308,5 @@ class ApiClientWeex extends ApiClientInterface<WeexStreamOption> {
         return sign;
     }
 }
+
 export default ApiClientWeex;
