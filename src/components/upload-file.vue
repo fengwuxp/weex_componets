@@ -8,6 +8,7 @@
 
     const actionSheet = weex.requireModule('actionSheet');
     const photo = weex.requireModule('photo');
+    const appMain=weex.requireModule("appMain");
 
     const nat_camera = weex.requireModule('nat_camera');
     const nat_network_transfer = weex.requireModule('nat_network_transfer');
@@ -84,6 +85,7 @@
             uploadByNative(filePath) {
                 const self = this;
                 console.log("上传filePath：" + filePath);
+                appMain.showProgressBar(20);
                 nat_network_transfer.upload({
                     url: PIC_SERVICE_URL,
                     path: filePath
@@ -97,6 +99,7 @@
                         console.log("上传中!");
                         return;
                     }
+                    appMain.hideProgressBar();
                     if (!ok) {
                         console.log("上传失败!");
                         return;
@@ -163,7 +166,14 @@
                             weexUtils.toast("图片选择出现异常!");
                             return;
                         }
-                        self.uploadByNative(data);
+                        if(data.toString().toLowerCase().indexOf("p:")===0){
+                            //表示进度信息
+                            appMain.showProgressBar(20);
+                        }else {
+                            appMain.hideProgressBar();
+                            self.uploadByNative(data);
+                        }
+
                     }, (message) => {
                         weexUtils.toast(message);
                     });

@@ -31,15 +31,15 @@ export default {
         }
     },
     created() {
-        const self = this;
-        const env = weex.config.env;
-        let rWidth = env.deviceWidth;
-        env.deviceWidth > 828 && (rWidth = env.deviceWidth / 3 * 2);
-        self.rpx = 750 / rWidth;
-        if (self.web) {
-            //浏览器中有vue-route处理
-            return;
-        }
+        // const self = this;
+        // const env = weex.config.env;
+        // let rWidth = env.deviceWidth;
+        // env.deviceWidth > 828 && (rWidth = env.deviceWidth / 3 * 2);
+        // self.rpx = 750 / rWidth;
+        // if (self.web) {
+        //     //浏览器中有vue-route处理
+        //     return;
+        // }
     },
     methods: {
 

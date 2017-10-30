@@ -1,6 +1,6 @@
 {
   "name": "wxp_weex_componets",
-  "version": "1.0.108",
+  "version": "1.0.111",
   "publishConfig": {
     "registry": "http://nexus.oaknt.com:18081/repository/oak_npm_hosted/"
   },

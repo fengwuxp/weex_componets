@@ -129,12 +129,13 @@ class ApiClientWeex extends ApiClientInterface<WeexStreamOption> {
         //WEEX stream对象 https://weex.apache.org/cn/references/modules/stream.html
         let headers = option.headers;
 
+        let method = ReqMethod[option.method];
         this.client.fetch({
-            method: ReqMethod[option.method],               //请求方法get post
+            method,               //请求方法get post
             url: option.url,                      //请求url
             type: "json", //DataType[option.type].toLowerCase(),                    //响应类型, json,text 或是 jsonp {在原生实现中其实与 json 相同)
             headers: headers,             //headers HTTP 请求头
-            body: option.data == null ? "" : JSON.stringify(option.data)     //参数仅支持 string 类型的参数，请勿直接传递 JSON，必须先将其转为字符串。请求不支持 body 方式传递参数，请使用 url 传参。
+            body: (option.data == null || method === "GET") ? null : JSON.stringify(option.data)     //参数仅支持 string 类型的参数，请勿直接传递 JSON，必须先将其转为字符串。请求不支持 body 方式传递参数，请使用 url 传参。
         }, function (response) {
             // console.log(response);
             /**
@@ -164,7 +165,7 @@ class ApiClientWeex extends ApiClientInterface<WeexStreamOption> {
              */
 
             if (!isFunction(option.progressCallback)) {
-                console.warn("未提供 progressCallback回调");
+               // console.warn("未提供 progressCallback回调");
                 return;
             }
             option.progressCallback(resp);
