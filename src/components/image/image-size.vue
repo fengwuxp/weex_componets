@@ -1,9 +1,9 @@
 <!--扩展weex的image能力 加入自适应布局功能-->
 <template>
-    <image v-if="show" @click="click" :src="src" :style="style"></image>
+    <image v-if="show" @load="imageLoad" @click="click" :src="src" :style="style"></image>
 </template>
 <script>
-    import {imageLoader} from "../../utils/ExportWeexModel";
+    import {imageLoader} from "typescript_api_sdk/src/utils/ExpotrtWeexCustomModel";
 
     export default {
         props: {
@@ -19,16 +19,13 @@
             }
         },
         data() {
-            // let web = weex.config.env.platform.toLowerCase() === "web";
             return {
-                //web,
                 show: false
             };
         },
         methods: {
             click() {
-                console.log("cliek -> ")
-                this.$emit("imageClick",this.src);
+                this.$emit("imageClick", this.src);
             },
             //固定比例
             fixedProportion() {
@@ -40,26 +37,29 @@
              * @param imageHeight
              */
             setSize({imageWidth, imageHeight}) {
-                if (this.width === -1 && this.height === -1) {
+                let autoWidth = this.height === -1;
+                let autoHeihgt = this.width === -1;
+                if (autoWidth && autoHeihgt) {
                     //自适应
                     if (imageWidth <= this.maxWidth) {
                         this.width = imageWidth;
-                    }else {
+                    } else {
                         this.width = this.maxWidth;
                     }
                 }
                 let width, height, proportion;
-                if (this.height === -1) {
+                if (autoWidth) {
                     //指定宽度 高度自适应
                     proportion = imageWidth / this.width;
                     width = this.width;
                     height = imageHeight / proportion;
-                } else if (this.width === -1) {
+                }else if (autoHeihgt) {
                     //指定高度，宽度自适应
                     proportion = imageHeight / this.height;
                     height = this.height;
                     height = imageWidth / proportion;
-                } else {
+                }
+                if (!autoHeihgt && !autoWidth) {
                     //强行指定高度
                     width = this.width;
                     height = this.height;
@@ -67,6 +67,10 @@
                 this.setStyle({
                     width: width + "px",
                     height: height + "px"
+                });
+                this.$emit("onLoad", {
+                    width,
+                    height
                 });
             },
             /**
@@ -77,33 +81,32 @@
                 this.style = Object.assign(this.style, style);
                 this.show = true;
                 console.log("图片样式-> " + JSON.stringify(this.style));
+            },
+            imageLoad({size, success}) {
+                const {
+                    naturalWidth,
+                    naturalHeight
+                } = size;
+                this.setSize({
+                    imageWidth: naturalWidth,
+                    imageHeight: naturalHeight
+                });
             }
         },
         beforeMount() {
-            this.width = parseInt(this.width);
-            this.maxWidth=parseInt(this.maxWidth)
-            if (this.width > this.maxWidth) {
-                //最大宽度
-                this.width = this.maxWidth;
-            }
-            this.height = parseInt(this.height);
-            if (this.width > 0 && this.height > 0) {
-                this.setStyle({
-                    width: this.width + "px",
-                    height: this.height + "px"
+            this.width=parseInt(this.width);
+            this.height=parseInt(this.height);
+            imageLoader.loadImageInfo(this.src, this.width === -1 ? this.maxWidth : this.width,
+                (map) => {
+                    const {reqWidth, reqHeight} = map;
+                    this.setSize({
+                        imageWidth: reqWidth,
+                        imageHeight: reqHeight
+                    });
+                    console.log("获取图片高度!-> " + JSON.stringify(map));
+                }, (msg) => {
+                    console.log("获取图片高度失败!-> " + msg);
                 });
-                return;
-            }
-            imageLoader.loadImageInfo(this.src, this.width, (map) => {
-                const {reqWidth, reqHeight} = map;
-                this.setSize({
-                    imageWidth: reqWidth,
-                    imageHeight: reqHeight
-                });
-                console.log("获取图片高度!-> " + JSON.stringify(map));
-            }, (msg) => {
-                console.log("获取图片高度失败!-> " + msg);
-            });
         }
     }
 </script>

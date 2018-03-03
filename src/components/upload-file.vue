@@ -1,14 +1,24 @@
 <template>
-    <image @click="uploadImage" :src="uploadFileTipImage" :style="uploadNativeStyle"></image>
+    <div style="position: relative;">
+        <image @click="uploadImage"
+               :src="uploadFileTipImage"
+               :style="uploadNativeStyle"></image>
+        <div v-if="uploadStatus===1 && maskText"
+             :style="Object.assign({},uploadNativeStyle,maskStyle)"
+             class="mask_text">
+            <text :style="maskTextStyle" :value="maskText"></text>
+        </div>
+
+    </div>
 </template>
 
 <script>
-    import GlobalApiConfig from "../api/config/GlobalAipConfig";
+    import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
     import weexUtils from "../utils/WeexUtils";
 
     const actionSheet = weex.requireModule('actionSheet');
     const photo = weex.requireModule('photo');
-    const appMain=weex.requireModule("appMain");
+    const appMain = weex.requireModule("appMain");
 
     const nat_camera = weex.requireModule('nat_camera');
     const nat_network_transfer = weex.requireModule('nat_network_transfer');
@@ -66,9 +76,24 @@
             crop: {
                 default: true
             },
-            radius:{ //圆角大小
-                default:0
+            radius: { //圆角大小
+                default: 0
+            },
+            maskText: {
+                default: "图片上传中..."
+            },
+            maskStyle: {
+                default: {
+                    backgroundColor: "rgba(0,0,0,.4)"
+                }
+            },
+            maskTextStyle: {
+                default: {
+                    color: "#ffffff",
+                    fontSize: 30
+                }
             }
+
         },
         data() {
             const width = this.width;
@@ -77,8 +102,12 @@
                 width: width + "px",
                 height: height + "px",
             };
+            let ios = weex.config.env.platform.toLowerCase() === "ios";
             return {
-                uploadNativeStyle
+                ios,
+                uploadNativeStyle,
+                //上传状态 0：等待 1:上传中 2：上传成功 -1：上传失败
+                uploadStatus: 0
             }
         },
         methods: {
@@ -86,6 +115,7 @@
                 const self = this;
                 console.log("上传filePath：" + filePath);
                 appMain.showProgressBar(20);
+                this.uploadStatus = 1;
                 nat_network_transfer.upload({
                     url: PIC_SERVICE_URL,
                     path: filePath
@@ -101,6 +131,7 @@
                     }
                     appMain.hideProgressBar();
                     if (!ok) {
+                        this.uploadStatus = -1;
                         console.log("上传失败!");
                         return;
                     }
@@ -108,13 +139,13 @@
                         console.log("上传无结果!");
                         return;
                     }
-
+                    this.uploadStatus = 2;
                     const resp = JSON.parse(data);
                     const {url} = resp;
                     const map = {};
                     result = {
                         orderNumber: self.orderNumber,
-                        url: PIC_SERVICE_DOMAIN+ url
+                        url: PIC_SERVICE_DOMAIN + url
                     }
                     console.log("map->  " + JSON.stringify(map));
                     self.$emit("uploadCallback", {
@@ -125,6 +156,7 @@
                                 width: width + "px",
                                 height: height + "px"
                             }
+                            this.uploadStatus = 0;
                         }
                     });
 
@@ -150,42 +182,61 @@
                         console.log("图片选择或拍照失败");
                         return;
                     }
-                    const {value, index} = ret.data;
+                    const {message, index} = ret.data;
+                    if (index > 1) {
+                        console.log("取消");
+                        return;
+                    }
                     const proportion = {};
                     if (self.proportion.length === 0) {
                         //表示不限制
                     } else {
+                        //ios 支持 1：1   4：3   16：9
                         proportion.aspectX = self.proportion[0];
                         proportion.aspectY = self.proportion[1]
                     }
                     const {aspectX, aspectY} = proportion;
-                    let flag = index === 0;
-                    photo.capture(flag, this.crop, {aspectX: aspectX, aspectY: aspectY}, (data) => {
-                        console.log("local path-> " + data);
-                        if (data === undefined || data === null) {
-                            weexUtils.toast("图片选择出现异常!");
-                            return;
-                        }
-                        if(data.toString().toLowerCase().indexOf("p:")===0){
-                            //表示进度信息
-                            appMain.showProgressBar(20);
-                        }else {
-                            appMain.hideProgressBar();
-                            self.uploadByNative(data);
-                        }
+                    console.log("是否为拍照--> " + (message === "拍照"))
+                    photo.capture(this.booleanConver(index === 0),
+                        this.booleanConver(this.crop),
+                        {aspectX: aspectX, aspectY: aspectY}, (data) => {
+                            console.log("local path-> " + data);
+                            if (data === undefined || data === null) {
+                                weexUtils.toast("图片选择出现异常!");
+                                return;
+                            }
+                            if (data.toString().toLowerCase().indexOf("p:") === 0) {
+                                //表示进度信息
+                                appMain.showProgressBar(20);
+                            } else {
+                                appMain.hideProgressBar();
+                                self.uploadByNative(data);
+                            }
 
-                    }, (message) => {
-                        weexUtils.toast(message);
-                    });
+                        }, (message) => {
+                            weexUtils.toast(message);
+                        });
                 });
+            },
+
+            /**
+             * 针对Ios下boolean转换失败的处理 返回0 或 1
+             * @param flag
+             * @return {*}
+             */
+            booleanConver(flag) {
+                if (!this.ios) {
+                    return flag;
+                }
+                return flag ? 1 : 0;
             },
             uploadImage(event) {
                 this.chooseImage();
             }
         },
         beforeMount() {
-            console.log("this.rudius-> "+this.radius);
-            if (this.radius>0) {
+            console.log("this.rudius-> " + this.radius);
+            if (this.radius > 0) {
                 this.uploadNativeStyle.borderRadius = this.radius + "px";
             }
         }
@@ -194,5 +245,11 @@
 </script>
 
 <style scoped>
-
+    .mask_text {
+        position: absolute;
+        justify-content: center;
+        align-items: center;
+        top:0;
+        left: 0;
+    }
 </style>

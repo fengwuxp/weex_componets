@@ -7,8 +7,8 @@
                 :defaultStyle="defaultStyle"
                 :selectedStyle="selectedStyle"
                 :selectedIndex="selectedIndex"
-                @changeTabItem="changeTabItem"
-                @changeTabIndex="changeTabIndex"></tab-item-scroll-header>
+                :scrollStyle="scrollStyle"
+                @changeTabItem="changeTabItem"></tab-item-scroll-header>
         <div v-if="web"
              class="flex_cell view_wrapper">
             <div v-for="(item,i) in tabList"
@@ -17,25 +17,19 @@
                 <slot :name="'tab_item'+i"></slot>
             </div>
         </div>
-        <!--<div v-if="!web"-->
-        <!--class="view_wrapper flex_cell">-->
-        <!--<embed class="view_content"-->
-        <!--v-for="(item,i) in tabList"-->
-        <!--:src="item.src"-->
-        <!--:style="item.style"-->
-        <!--type="weex"></embed>-->
-        <!--</div>-->
         <slider v-if="!web"
                 :infinite="false"
                 :index="selectedIndex"
                 @change="changeSlider"
                 class="view_wrapper flex_cell">
-            <embed v-for="(item,i) in tabList"
-                   :key="i"
-                   class="view_content"
-                   :src="item.src"
-                   :style="item.style"
-                   type="weex"></embed>
+            <div class="view_content"
+                 v-for="(item,i) in tabList"
+                 :key="i">
+                <embed class="flex_cell"
+                        :src="item.src"
+                        :style="item.style"
+                        type="weex"></embed>
+            </div>
         </slider>
     </div>
 </template>
@@ -53,6 +47,15 @@
         props: {
             tabList: {default: []},
             items: {default: []},
+            scrollStyle: {
+                default: {
+                    height: "80px",
+                    justifyContent: "flex-start",
+                    width: "750px",
+                    paddingLeft: "20px",
+                    paddingRight: "20px"
+                }
+            },
             defaultStyle: {
                 default: {
                     container: {

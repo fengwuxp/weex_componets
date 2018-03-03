@@ -1,7 +1,11 @@
 import weexGetPathUtils from "../utils/WeexGetPathUtils";
 import weexUtils from "../utils/WeexUtils";
 import commonUtils from "../utils/CommonUtils";
-import {navigator} from "../utils/ExportWeexModel";
+import {navigator, weexModule} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
+//导入原生路由配置
+import nativeRoute from '../../../../src/router/RouterNativeMaps';
+import StringToHexUtil from "typescript_api_sdk/src/codec/StringToHexUtil";
+import {DEFAULT_PARAM_KEY_NAME} from "../mixins/ConstKey";
 
 
 let packageName = weex.config.env.appGroup;
@@ -9,28 +13,35 @@ if (packageName === null || packageName === undefined || packageName.toString().
     packageName = weex.config.env.appName;
 }
 
+const PLATFORM_NAME = weex.config.env.platform.toLowerCase();
+
+//默认宽度
+const DEFAULT_WIDTH = 750.0;
 
 export default {
     data() {
-        let platform = weex.config.env.platform;
-        let isIos = platform.toLowerCase() === 'ios';
+        let isIos = PLATFORM_NAME === 'ios';
         let newNavigator = navigator;
         if (isIos) {
             newNavigator = weex.requireModule("nav");
         }
         let deviceWidth = weex.config.env.deviceWidth;
-        let defWidth = 750.0;  //默认宽度
-        let rpx = deviceWidth / defWidth;
+
+        let rpx = deviceWidth / DEFAULT_WIDTH;
         return {
             deviceWidth,
             rpx: rpx,
-            android: platform.toLowerCase() === 'android',
+            android: PLATFORM_NAME === 'android',
             ios: isIos,
-            web: platform.toLowerCase() === 'web',
+            web: PLATFORM_NAME === 'web',
             newNavigator
         }
     },
-    created() {
+    mounted() {
+
+
+    },
+    beforeMount() {
         // const self = this;
         // const env = weex.config.env;
         // let rWidth = env.deviceWidth;
@@ -41,13 +52,30 @@ export default {
         //     return;
         // }
     },
+    created() {
+
+    },
+    /**
+     * 销毁之前
+     */
+    beforeDestroy() {
+
+    },
+    /**
+     * 页面销毁
+     */
+    destroyed() {
+
+    },
     methods: {
+
 
         /**
          * 返回
          * @param callback
          */
         back: function (callback) {
+            //上报友盟
             if (this.web) {
                 this.$router.back();
             } else {
@@ -68,9 +96,9 @@ export default {
          */
         jump(url = "", params = {}, isPopSelf = false, callback = () => {
         }) {
-            if (!this.web) {
+            if (PLATFORM_NAME !== "web") {
+
                 let routerKey = url.split("?")[0].substr(1, url.length);
-                const nativeRoute = this.getNativeRoute();
                 let route = nativeRoute[routerKey];   //尝试从路由配置中获取
                 console.log(route);
                 console.log(url);
@@ -96,16 +124,6 @@ export default {
                     }
                 }
 
-                if (route.path.indexOf(":") > 0) {
-                    //存在参数
-                    //仅支持单个参数的解析
-                    let split = route.path.split(":");
-                    let paramsKey = split[1];
-                    let value = url.replace(split[0], "");
-                    let p = {};
-                    p[paramsKey] = value;
-                    params = Object.assign({}, params, p);
-                }
                 this.openWeexByNative(gotoURL, main, params, callback);
                 if (isPopSelf && this.android) {
                     //清除自己的堆栈，防止点击返回时回到该页面
@@ -141,24 +159,42 @@ export default {
          */
         openWeexByNative(url, main = false, params = {}, callback = () => {
         }) {
+
+            let i = 0;
+
+            //构建参数
+            let queryString = "";
+            for (let key in params) {
+                queryString += key + "=" + params[key] + "&";
+                i++;
+            }
+
+            queryString = queryString.substr(0, queryString.length - 1);
+
+            if (queryString.trim().length > 0 && commonUtils.isNullOrUndefined(params['weex_refresh'])) {
+
+                //转为16进制数据
+                queryString = StringToHexUtil.encode(queryString);
+                console.log("转为16进制数据编码后-> " + queryString);
+                queryString = DEFAULT_PARAM_KEY_NAME + "=" + queryString;
+            } else {
+                //TODO
+            }
+
+
             if (url.indexOf("?") < 0) {
                 url += "?";
             }
-            let i = 0;
-            //构建参数
-            for (let key in params) {
-                url += key + "=" + params[key] + "&";
-                i++;
-            }
-            if (i > 0) {
-                url = url.substr(0, url.length - 1);
-            }
+
+            url += queryString;
+
+
             let gotoURL = "weex://" + packageName + (main ? "/main/" : "/page/") + url;
             this.newNavigator.push({
                 url: gotoURL,
                 animated: "true"
             }, event => {
-                callback();
+                callback(event);
             });
         },
         /**
@@ -172,10 +208,29 @@ export default {
             let length = keys.length;
             if (!this.web) {
                 const bundleUrl = weex.config.bundleUrl;
-                const queryStr = bundleUrl.split("?")[1];  //获取查询字符串
-                if (queryStr === undefined || queryStr.trim().length === 0) {
+                let queryStr = bundleUrl.split("?")[1];  //获取查询字符串
+
+                if (!commonUtils.hasText(queryStr)) {
                     //如果不存在查询字符串则直接返回
-                    return params;
+                    return "";
+                }
+
+                let _pString = queryStr.split("&")[0];  //获取第一个参数
+                if (!commonUtils.hasText(_pString)) {
+                    return "";
+                }
+
+                //是否被hex处理过
+                let isDecode = _pString.indexOf(DEFAULT_PARAM_KEY_NAME) >= 0;
+
+                if (isDecode) {
+                    //获取实际被处理过的16进制的参数
+                    _pString = _pString.split("=")[1];
+                    if (commonUtils.hasText(queryStr)) {
+                        //16进制转10进制
+                        queryStr = StringToHexUtil.decode(_pString);
+                        console.log("16进制转10进制-> " + _pString);
+                    }
                 }
                 let list = queryStr.split("&");
                 list.forEach(function (item) {
@@ -206,7 +261,7 @@ export default {
          * @return String
          */
         getBasePath(uri = null) {
-            let basePath = weexUtils.getBasePath(weex);
+            let basePath = weexUtils.getBasePath();
             if (uri === null) {
                 return basePath;
             } else {

@@ -1,13 +1,12 @@
 <!--带有背景图的 左侧为slot的 顶部导航-->
 <template>
     <div class="header_container" :style="containerStyle">
-        <image :src="bgImageURL" class="bg_all" :style="bgImageStyle"></image>
+        <image v-if="bgImageURL" :src="bgImageURL" class="bg_all" :style="bgImageStyle"></image>
         <div v-if="ios" :style="iosTopStyle"></div>
-        <div class="header" :style="headerStyle">
-            <div @click="clickBackButton"
-                 :style="leftStyle"
+        <div class="header" :style="style">
+            <div :style="leftStyle"
                  class="left-back">
-                <slot name="app-header-left"></slot>
+                <slot></slot>
             </div>
             <text v-if="title.length>0"
                   class="title"
@@ -33,9 +32,12 @@
 
 <script>
     import weexUtils from "../../utils/WeexUtils";
-    import GlobalApiConfig from "../../api/config/GlobalAipConfig";
+    import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
+    import {isIos, getIosTopHeight, getViewHeaderHeight} from "../../utils/FlexViewUtils";
 
     const appHeaderConfig = GlobalApiConfig.APP_HEADER_CONFIG;
+
+    const bagImageURL = appHeaderConfig.bagImageURL ? appHeaderConfig.bagImageURL : "";
 
     export default {
         name: "app-header",
@@ -50,48 +52,45 @@
                 default: {}
             },
             titleStyle: {
-                default: Object.assign({fontSize:"36px"},appHeaderConfig.titleStyle)
+                default: Object.assign({fontSize: 36}, appHeaderConfig.data.titleStyle)
             },
-
-            rightTextStyle: {
-                default: {
-                    right: "15px",
-                    fontSize: "32px",
-                    color: ": #ffffff"
-                }
-            },
+            rightTextStyle: Object.assign({
+                right: 15,
+                fontSize: 32,
+                top: 34,
+                lineHeight: 32,
+                height:32,
+                color: "#ffffff"
+            }, appHeaderConfig.data.rightTextStyle),
             rightIconStyle: {
                 default: {
-                    right: "20px",
-                    top: "20px",
-                    width: " 60px",
-                    height: "60px"
-                }
-            },
-            iosTopStyle: {
-                default: {
-                    height: "28px",
-                    backgroundColor: "transparent"
+                    right: 20,
+                    top: 25,
+                    width: 50,
+                    height: 50
                 }
             },
             bgImageStyle: {
                 default: {}
             },
-            bgImageURL: {default: weexUtils.getResourcesURL(appHeaderConfig.bagImageURL, weex)},
+            bgImageURL: {default: weexUtils.getResourcesURL(bagImageURL)},
+            headerIosTopStyle: {default: {}},
         },
         data() {
-            let ios = weex.config.env.platform.toLowerCase() === 'ios';
+            let ios = isIos();
+            const {style}=appHeaderConfig.data;
             return {
                 headerStyle: {},
                 containerStyle: {},
                 ios,
-                iosTop: 28
+                style,
+                iosTopStyle: Object.assign({
+                    height: getIosTopHeight(),
+                }, appHeaderConfig.data.iosTopStyle),
             }
         },
         methods: {
-            clickBackButton: function () {
-                this.$emit("backPage");
-            },
+
             clickText() {
                 this.$emit("clickHeaderText");
             },
@@ -100,16 +99,13 @@
             }
         },
         beforeMount() {
-            let height = this.headerHeight;
             if (this.ios) {
-                height += this.iosTop;
                 this.bgImageURL = this.bgImageURL.replace("bg", "ios-bg");
             }
-            this.containerStyle = {
-                height: height + "px"
-            };
+            this.containerStyle =  Object.assign({},{
+                height:getViewHeaderHeight()+"px"
+            }, this.headerIosTopStyle);
             this.headerStyle.height = this.headerHeight + "px";
-
         }
     }
 </script>
@@ -119,19 +115,19 @@
         position: relative;
     }
 
+    .header {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
     .bg_all {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-    }
-
-    .header {
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        position: relative;
     }
 
     .left-back {

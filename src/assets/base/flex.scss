@@ -6,20 +6,32 @@
   justify-content: center;
   align-items: center;
 }
-.flex_between{
+.flex_v_between{
   justify-content: space-between;
   align-items: center;
+}
+.flex_between{
+  justify-content: space-between;
+}
+.flex_h_end{
+  justify-content: flex-end;
+}
+.flex_v_end{
+  align-items: flex-end;
 }
 
 .flex_v_center{
   align-items: center;
+}
+.flex_h_center{
+  justify-content: center;
 }
 
 .flex_cell{
   flex: 1;
 }
 .default_bg_color{
-  background-color:#f6f6f6 ;
+  background-color:#f2f2f2 ;
 }
 .bg_white{
   background-color: #ffffff;

@@ -1,13 +1,14 @@
 /**
  * Created by wuxp on 2017/6/6.
  */
-import {isNullOrUndefined} from "util";
+import {isNullOrUndefined, isString, isNumber} from "util";
 
 const moneyRegExp = /^[0-9]+[\.]?[0-9]{0,2}$/;
 
 class CommonUtils {
 
-    constructor() {}
+    constructor() {
+    }
 
     /**
      * 是否为金额
@@ -36,8 +37,35 @@ class CommonUtils {
      * @param obj
      * @return {Boolean}
      */
-    isNullOrUndefined=(obj:any):Boolean=>{
-       return isNullOrUndefined(obj);
+    isNullOrUndefined = (obj: any): Boolean => {
+        return isNullOrUndefined(obj);
+    };
+
+    /**
+     * 是否为一个空对象
+     * @param obj
+     * @return {Boolean}
+     */
+    isEmptyObject = (obj: any): Boolean => {
+        if (isNullOrUndefined(obj)) {
+            return true;
+        }
+        if (isString(obj)) {
+            let k: string = obj.trim();
+            if (k.trim().length === 0) {
+                return true;
+            }
+            if (k === "null" || k === "undefined" || k === "{}" || k === "[]") {
+                return true;
+            }
+        }
+        if (isNumber(obj) && isNaN(obj)) {
+            return true;
+        }
+        for (let k in obj) {
+            return false
+        }
+        return true;
     };
 
     /**
@@ -45,11 +73,14 @@ class CommonUtils {
      * @param {String} val
      * @return {number}
      */
-    trim=(val:String):String=>{
-        if(this.isNullOrUndefined(val)){
+    trim = (val: String): String => {
+        if (this.isNullOrUndefined(val)) {
             return "";
         }
-       return val.trim();
+        if (!isString(val)) {
+            val = val.toString();
+        }
+        return val.trim();
     };
 
     /**
@@ -57,8 +88,8 @@ class CommonUtils {
      * @param {String} val
      * @return {Boolean}
      */
-    hasText=(val:String):Boolean=>{
-       return this.trim(val).length>0;
+    hasText = (val: String): Boolean => {
+        return this.trim(val).length > 0;
     }
 }
 

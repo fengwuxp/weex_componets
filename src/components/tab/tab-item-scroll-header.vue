@@ -9,25 +9,19 @@
              :key="i"
              :ref="'item_header_'+i"
              @click="changeTab(i)"
-             :style="item.style">
-            <text :style="item.textStyle">{{item.text}}</text>
+             :style="getContainerStyle(i)">
+            <text :style="getTextStyle(i)">{{item.text}}</text>
         </div>
     </scroller>
 </template>
 <script>
-    import {dom} from "../../utils/ExportWeexModel";
+    import {dom} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 
     export default {
         props: {
             items: {default: []},
-            scrollStyle: {
-                default: {
-                    height: "80px",
-                    justifyContent: "flex-start",
-                    width: "750px",
-                    paddingLeft:"20px",
-                    paddingRight:"20px"
-                }
+            scrollStyle:{
+                default:{}
             },
             defaultStyle: {
                 default: {
@@ -63,7 +57,6 @@
                 if (this.selectedIndex === i) {
                     return;
                 }
-                this.changeStyle(this.selectedIndex, i);
                 this.$emit("changeTabItem", {
                     currentIndex: this.selectedIndex,
                     index: i,
@@ -74,30 +67,25 @@
                     const el = this.$refs['item_header_' + targetIndex][0];
                     dom.scrollToElement(el);
                 }
+
             },
-            /**
-             *
-             * @param selected 当前选择中的
-             * @param next 下一个选中的
-             */
-            changeStyle(selected, next) {
-                this.items[next].style = Object.assign({}, this.selectedStyle.container);
-                this.items[next].textStyle = Object.assign({}, this.selectedStyle.text);
-                this.items[selected].style = Object.assign({}, this.defaultStyle.container);
-                this.items[selected].textStyle = Object.assign({}, this.defaultStyle.text);
-                this.items = Object.assign([], this.items);
+            getTextStyle(index){
+                if(index===this.selectedIndex){
+                    return this.selectedStyle.text
+                }else {
+                    return this.defaultStyle.text;
+                }
+            },
+            getContainerStyle(index){
+                if(index===this.selectedIndex){
+                    return this.selectedStyle.container
+                }else {
+                    return this.defaultStyle.container;
+                }
             }
         },
         beforeMount() {
-            this.items.forEach((item, i) => {
-                if (i === this.selectedIndex) {
-                    item.style = Object.assign({}, this.selectedStyle.container);
-                    item.textStyle = Object.assign({}, this.selectedStyle.text);
-                } else {
-                    item.style = Object.assign({}, this.defaultStyle.container);
-                    item.textStyle = Object.assign({}, this.defaultStyle.text);
-                }
-            });
+
         }
     }
 </script>

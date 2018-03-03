@@ -31,7 +31,7 @@
 <script>
     import AppHeader from "../structure/app-header.vue";
 
-    import {imageLoader} from "../../utils/ExportWeexModel";
+    import {imageLoader} from "typescript_api_sdk/src/utils/ExpotrtWeexCustomModel";
     import weexUtils from "../../utils/WeexUtils";
 
     export default {

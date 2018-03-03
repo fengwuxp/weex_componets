@@ -1,71 +1,78 @@
 <!--下拉刷新视图-->
 <template>
-    <!--<div style="flex:1;">-->
-    <!---->
-    <!--<slot name="drop-no-scroller"></slot>-->
-    <!--</div>-->
-    <scroller :style="listStyle"
+    <scroller class="flex_cell"
               :loadmoreoffset="loadmoreoffset"
               @scroll="viewScroll"
               @loadmore="loadmore"
               show-scrollbar="false">
-        <refresh class="flex_row" :style="refreshContainerStyle"
+        <refresh class="flex_row"
+                 :style="refreshContainerStyle"
                  @refresh="viewRefresh"
                  @pullingdown="viewOnPullingDown"
                  :display="showRefresh ? 'show' : 'hide'">
-            <div class="flex_row flex_v_center" :style="refreshContentStyle">
+            <div v-if="userIndicator==='default'"
+                 class="flex_row flex_v_center"
+                 :style="refreshContentStyle">
                 <image :src="images[currentAnimationFrame]" :style="imageStyle"></image>
-                <div v-if="refreshTitle.length>0 && pullDownTipText.length>0 ">
+                <div style="margin-left: 5px;">
                     <text class="loading_text" v-if="refreshTitle.length>0">{{refreshTitle}}</text>
                     <text class="loading_text" v-if="tipStatus===false">{{pullDownTipText}}</text>
                     <text class="loading_text" v-if="tipStatus">{{refreshTipText}}</text>
                 </div>
             </div>
+            <div v-if="userIndicator==='indicator'"
+                 class="flex_row flex_v_center"
+                 :style="refreshContentStyle">
+                <text class="loading_text" :value="refreshTitle"></text>
+                <loading-indicator color="red" :style="indicatorStyle"></loading-indicator>
+            </div>
+            <slot v-if="userIndicator==='custom'" name="refresh-view"></slot>
         </refresh>
         <slot></slot>
     </scroller>
 </template>
 <script>
-    import tabbarPage from '../mixins/TabbarPage';
-    import {timer} from "../utils/ExportWeexModel";
+    import {timer} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
     import weexUtils from "../utils/WeexUtils";
 
     export default {
-        mixins: [tabbarPage],
+        //mixins: [tabbarPage],
         props: {
             imageStyle: {
                 default: {
-                    width: "224px",
-                    height: "126px"
+                    width: "60px",
+                    height: "60px"
                 }
             },
             refreshContainerStyle: {
                 default: {
-                    width: "750px"
+                    width: "750px",
+                    justifyContent:"center"
                 }
             },
-            refreshContentStyle:{
-                default: {
-                    paddingLeft:"100px"
-                }
+            refreshContentStyle: {
+                default: {}
             },
-            images: { default: [
-                weexUtils.getResourcesURL("images/animation/pull_to_refresh_people_0.png", weex),
-                weexUtils.getResourcesURL("images/animation/pull_to_refresh_people_1.png", weex),
-                weexUtils.getResourcesURL("images/animation/pull_to_refresh_people_2.png", weex),
-                weexUtils.getResourcesURL("images/animation/pull_to_refresh_people_3.png", weex),
-                weexUtils.getResourcesURL("images/animation/pull_to_refresh_people_4.png", weex),
-                weexUtils.getResourcesURL("images/animation/pull_to_refresh_people_5.png", weex)
-            ]},
+            //刷新动画图片数组长度
+            imagesLength: {
+                default: 5
+            },
             refreshTitle: {default: ""},
             pullDownTipText: {default: "松开后刷新"},
             refreshTipText: {default: "正在加载中"},
             frameTimes: {default: 130},
-            loadmoreoffset:{default:120},
-            headerHeight: {default: 0}
+            loadmoreoffset: {default: 120},
+            headerHeight: {default: 0},
+            indicatorStyle: {
+                width: "60px",
+                height: "60px",
+                color: "red"
+            },
+            userIndicator: {default: "default"} //使用默认的动画效果
         },
         data() {
             return {
+                images: [],
                 showRefresh: false,
                 tipStatus: false,
                 animationFrameHandler: null,
@@ -91,7 +98,7 @@
                     this.refreshEnd();
                 });
             },
-            refreshEnd(){
+            refreshEnd() {
                 timer.setTimeout(() => {
                     //结束动画
                     //this.viewRefreshAnimation();
@@ -101,7 +108,7 @@
                     }, 200);
                 }, 500);
             },
-            loadmore(){
+            loadmore() {
                 this.$emit("loadmore");
             },
             viewScroll(event) {
@@ -110,7 +117,12 @@
             }
         },
         created() {
-            const imagesLength = this.images.length;
+            const imagesLength = this.imagesLength;
+            const images = []
+            for (let i = 0; i < imagesLength; i++) {
+                images[i] = weexUtils.getResourcesURL("images/animation/pull_to_refresh_people_" + i + ".png");
+            }
+            this.images = images;
             this.animationFrameHandler = () => {
                 console.log("this.currentAnimationFrame-->  " + this.currentAnimationFrame);
                 if (this.currentAnimationFrame < imagesLength) {
@@ -131,8 +143,13 @@
     .flex_v_center {
         align-items: center;
     }
+
     .flex_row {
         flex-direction: row;
+    }
+
+    .flex_cell {
+        flex: 1;
     }
 
     .loading_text {

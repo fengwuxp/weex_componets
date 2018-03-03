@@ -11,8 +11,6 @@
 </template>
 <script>
 
-   // import {broadcast} from "wxp_weex_componets/src/utils/ExportWeexModel";
-
     export default {
         props:{
             items:{default:[]},

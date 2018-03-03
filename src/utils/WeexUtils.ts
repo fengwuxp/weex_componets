@@ -1,9 +1,13 @@
-import {isNullOrUndefined} from "util";
-import {storage, modal, cache, timer} from './ExportWeexModel.js';
-import EnumProxyFactory from "./EnumProxyFactory";
-import "./PromiseExt";
-import GlobalApiConfig from "../api/config/GlobalAipConfig";
-
+import {isNullOrUndefined, isString} from "util";
+import {storage, modal, timer, weexModule} from "typescript_api_sdk/src/utils/ExportWeexSdkModel.js";
+import {cache} from "typescript_api_sdk/src/utils/ExpotrtWeexCustomModel";
+import "typescript_api_sdk/src/api/PromiseExt";
+import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
+import {getViewHeaderHeight, DEFAULT_FOOTER_HEIGHT} from "./FlexViewUtils";
+import StringToHexUtil from "typescript_api_sdk/src/codec/StringToHexUtil";
+import {DEFAULT_PARAM_KEY_NAME} from "../mixins/ConstKey";
+import {FlexViewConfig} from "../components/FlexViewConfig";
+import commonUtils from "./CommonUtils";
 
 /**
  * 工具类
@@ -14,33 +18,43 @@ class WeexUtils {
 
     }
 
+
     /**
-     * @param target  目标枚举对象
-     * @return       目标枚举对象
+     * 获取js路径
+     * @param {string} uri
+     * @param {any} params 参数
+     * @return {string} js url
      */
-    valueOfEnum = function (target: any) {
-        let targetEnum = new target();
-        return EnumProxyFactory.newEnumProxyInstances(targetEnum);
-    };
+    getJSPath(uri: string = "", params: any = {}): string {
+        let queryKeyword: string = "";
+        for (let key in params) {
+            queryKeyword += key + "=" + params[key] + "&"
+        }
+        if (queryKeyword.trim().length > 0) {
+            queryKeyword = queryKeyword.substr(0, queryKeyword.length - 1);
+            queryKeyword = StringToHexUtil.encode(queryKeyword);
+            uri += ("?" + DEFAULT_PARAM_KEY_NAME + "=" + queryKeyword);
+        }
+        return this.getBasePath() + uri;
+    }
 
     /**
      * 获取资源url路径
      * @param uri
-     * @param weex weex对象
+     * @return {string} 资源url
      */
-    getResourcesURL(uri: String, weex: any) {
+    getResourcesURL(uri: String): string {
         //return GlobalConfig.DOMAIN + uri + "?123";
-        const basePath = this.getBasePath(weex).replace(GlobalApiConfig.WEB_DEPLOYMENT_DIRECTORY + "/", "");
-        return basePath + uri;
+        const basePath = this.getBasePath().replace(GlobalApiConfig.WEB_DEPLOYMENT_DIRECTORY + "/", "");
+        return basePath + uri;//+ "?t_=" + new Date().getTime();
     }
 
     /**
      * 获取base path
-     * @param weex
-     * @return {any}
+     * @return {string} weexURL路径
      */
-    getBasePath(weex: any) {
-        const bundleUrl = weex.config.bundleUrl;
+    getBasePath(): string {
+        const bundleUrl = weexModule.config.bundleUrl;
         //console.log("-bundleUrl->"+bundleUrl);
         let nativeBase;
         let isAndroidAssets = bundleUrl.indexOf('file://assets/') >= 0;
@@ -61,16 +75,17 @@ class WeexUtils {
      * 获取页面配置
      * @param view
      */
-    getViewConfig(view: any = {}, weex: any) {
-        const config = {
+    getViewConfig(view: FlexViewConfig = {}): FlexViewConfig {
+
+        const config: FlexViewConfig = {
             bodyScroll: false,
             bodyPadding: true,
             bodyIsCenter: true,
             bodyBackgroundColor: "#f2f2f2",
             useHeader: true,
             useFooter: true,
-            headerHeight: weex.config.env.platform.toLowerCase() === "ios" ? "128px" : "100px",
-            footerHeight: "83px",
+            headerHeight: getViewHeaderHeight(),
+            footerHeight: DEFAULT_FOOTER_HEIGHT,
             scrollerStyle: {flex: "1"}
         };
 
@@ -97,14 +112,20 @@ class WeexUtils {
 
     /**
      * 保证对象到storage中
+     * @param key
      * @param data
+     * @param expireTime
+     * @param needExpireTime
      */
-    setItem = (key: String, data: any, expireTime?: number, needExpireTime: boolean = false): Promise<Function> => {
+    setItem = (key: string, data: any, expireTime?: number, needExpireTime: boolean = false): Promise<Function> => {
         const self = this;
         return new Promise((resolve: Function = () => {
         }, reject: Function = () => {
         }) => {
             const store = {};
+            if (commonUtils.isEmptyObject(data)) {
+                data = "";
+            }
             if (needExpireTime) {
                 Object.assign(store, {
                     data: data,
@@ -128,10 +149,11 @@ class WeexUtils {
 
     /**
      * 获取storage 中的对象
-     * @param key
-     * @param Verification 验证
+     * @param key  获取存储值的key
+     * @param verification 自定义验证方法
+     * return {Promise}
      */
-    getItem = (key: String, verification: Function = (): Boolean => {
+    getItem = (key: string, verification: Function = (): Boolean => {
         return true;
     }): Promise<Function> => {
 
@@ -140,25 +162,36 @@ class WeexUtils {
         }) {
             //console.log("--获取的key--> " + key);
             cache.getCache(key, (data) => {
-                //console.log("获取到的数据--> " + data);
-                if (isNullOrUndefined(data)) {
+                // console.log("获取到的数据--> " + isNullOrUndefined(data));
+                if (commonUtils.isEmptyObject(data)) {
                     reject();
                     return;
                 }
                 let item = JSON.parse(data);
-                if (!isNullOrUndefined(item.expire) && item.expire < new Date().getTime()) {
+                //存在超时时间
+                let existExpire: boolean = item.hasOwnProperty("expire");
+                if (existExpire && item.expire < new Date().getTime()) {
                     //如果超时了 移除
                     storage.removeItem(key);
                     reject();
                     return;
                 }
-                let result = item.data;
-                //console.log("--执行callback--> " + JSON.stringify(result));
-                if (verification(result)) {
-                    resolve(result);
-                } else {
+
+                if (item.hasOwnProperty("data") && existExpire && commonUtils.isEmptyObject(item.data)) {
                     reject();
+                } else {
+                    let result = item.data;
+                    if (commonUtils.isEmptyObject(result)) {
+                        result = item;
+                    }
+                    if (verification(result)) {
+                        resolve(result);
+                    } else {
+                        reject();
+                    }
                 }
+
+
             });
         });
     };
@@ -185,7 +218,7 @@ class WeexUtils {
      * @param callback
      */
     alert = (options: any = {}, callback) => {
-        if (options.constructor === String) {
+        if (isString(options)) {
             options = {message: options}
         }
         options = Object.assign({
@@ -206,7 +239,7 @@ class WeexUtils {
     confirm = (options: any = {}, confirm = () => {
     }, cancel = () => {
     }) => {
-        if (options.constructor === String) {
+        if (isString(options)) {
             options = {message: options}
         }
         options = Object.assign({
@@ -233,7 +266,7 @@ class WeexUtils {
     prompt = (options: any = {}, confirm = (data) => {
     }, cancel = (data) => {
     }) => {
-        if (options.constructor === String) {
+        if (isString(options)) {
             options = {message: options}
         }
         options = Object.assign({
@@ -255,9 +288,8 @@ class WeexUtils {
      * 获取最大保存有效时间
      * @return {number}
      */
-    private getMaxExpireTime = (expireTime: number): Number => {
-        const times = new Date().getTime() + expireTime;
-        return times;
+    private getMaxExpireTime = (expireTime: number): number => {
+        return new Date().getTime() + expireTime;
     }
 
 }

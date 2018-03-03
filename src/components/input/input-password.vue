@@ -37,7 +37,7 @@
                 }
             },
             clearIconURL: {
-                default: weexUtils.getResourcesURL("images/clear_icon.png", weex)
+                default: weexUtils.getResourcesURL("images/clear_icon.png")
             },
             clearIconStyle: {
                 default: {
@@ -46,7 +46,7 @@
                     marginRight: "30px"
                 }
             },
-            eyeIconURL: {default: weexUtils.getResourcesURL("images/eye_icon.png", weex)},
+            eyeIconURL: {default: weexUtils.getResourcesURL("images/eye_icon.png")},
             placeholder: {
                 default: ""
             },
@@ -93,7 +93,7 @@
 
                 //检查输入
                 if (this.checkValue && this.checkValue.constructor === Function) {
-                    this.checkValue(() => {
+                    this.checkValue({value},() => {
                         this.setValue("");
                     });
                 }

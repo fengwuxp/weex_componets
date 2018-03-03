@@ -18,14 +18,6 @@
                 <slot :name="'tab_item'+i"></slot>
             </div>
         </div>
-        <!--<div v-if="!web"-->
-        <!--class="view_wrapper flex_cell">-->
-        <!--<embed class="view_content"-->
-        <!--v-for="(item,i) in tabList"-->
-        <!--:src="item.src"-->
-        <!--:style="item.style"-->
-        <!--type="weex"></embed>-->
-        <!--</div>-->
         <slider v-if="!web"
                 ref="tap_list"
                 :infinite="infinite"
@@ -33,12 +25,14 @@
                 :style="tabListStyle"
                 @change="changeSlider"
                 class="view_wrapper flex_cell">
-            <embed v-for="(item,i) in tabList"
-                   :key="i"
-                   class="view_content"
-                   :src="item.src"
-                   :style="item.style"
-                   type="weex"></embed>
+            <div class="view_content"
+                 v-for="(item,i) in tabList"
+                 :key="i">
+                <embed class="flex_cell"
+                       :src="item.src"
+                       :style="item.style"
+                       type="weex"></embed>
+            </div>
         </slider>
     </div>
 </template>

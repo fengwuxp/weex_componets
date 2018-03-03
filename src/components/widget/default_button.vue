@@ -39,13 +39,11 @@
                 this.$emit("clickButton");
             },
             touchstart() {
-                console.log(JSON.stringify(arguments));
                 let backgroundColor = this.containerStyle.backgroundColor;
                 backgroundColor = backgroundColor.replace("#", "#AF");
                 this.containerStyle.backgroundColor = backgroundColor;
             },
             touchend() {
-                console.log(JSON.stringify(arguments));
                 this.containerStyle.backgroundColor = this.containerStyle.backgroundColor.replace("#AF", "#");
             }
         },

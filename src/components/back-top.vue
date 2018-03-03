@@ -1,45 +1,49 @@
 <!--回到顶部-->
 <template>
-    <image v-if="show" :src="backTopIcon" :style="backStyle" @click="backTop"></image>
+    <image :src="backTopIcon" :style="backStyle" @click="backTop"></image>
 </template>
 <script>
     import weexUtils from "../utils/WeexUtils";
-    import {dom} from "../utils/ExportWeexModel"
+    import {dom} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 
+    const defStyle = {
+        right: "35px",
+        bottom: "120px"
+    }
+    const hideStyle = {
+        right: "-135px",
+        bottom: "120px"
+    }
     export default {
         props: {
-            backTopIcon: {default: weexUtils.getResourcesURL("images/back_top_icon.png", weex)},
+            backTopIcon: {default: weexUtils.getResourcesURL("images/back_top_icon.png")},
             backStyle: {
                 default: {
                     width: "80px",
                     height: "80px",
                     position: "fixed",
+                    ...hideStyle
                 }
-            },
-            position: {
-                default: {
-                    right: "35px",
-                    bottom: "120px"
-                }
-            },
-            show: {default: false}
+            }
         },
         data() {
             return {}
         },
         methods: {
             backTop() {
-                let el = this.$parent.$refs['top_position'];
-                dom.scrollToElement(el);
                 this.$emit("backTop");
             },
             change(contentOffset) {
                 const {y} = contentOffset;
-                this.show = (y + 100) < 0;
+                if ((y + 100) < 0) {
+                    this.backStyle = Object.assign(this.backStyle, defStyle);
+                } else {
+                    this.backStyle = Object.assign(this.backStyle, hideStyle);
+                }
             }
         },
         beforeMount() {
-            this.backStyle = Object.assign(this.backStyle, this.position);
+            // this.backStyle = Object.assign(this.backStyle);
         }
     }
 </script>

@@ -1,7 +1,7 @@
 /**
  * Created by wuxp on 2017/6/2.
  */
-import {dom} from "../utils/ExportWeexModel";
+import {dom} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 
 export default {
     data() {

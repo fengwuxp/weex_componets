@@ -2,7 +2,7 @@
     <div>
         <div v-if="ios" class="ios_top" :style="iosTopStyle"></div>
         <div class="header" :style="style">
-            <div @click="clickBackButton" :style="backStyle" class="left-back" v-if="useBack">
+            <div @click="clickBackButton" :style="backStyle" class="left-back" v-if="backIconUrl">
                 <image class="back" :src="backIconUrl"></image>
                 <text v-if="leftText" :style="leftTextStyle">{{leftText}}</text>
             </div>
@@ -28,14 +28,14 @@
 
 <script>
     import weexUtils from "../../utils/WeexUtils";
-    import GlobalApiConfig from "../../api/config/GlobalAipConfig";
+    import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
+    import {isIos,getIosTopHeight} from "../../utils/FlexViewUtils";
 
     const appHeaderConfig = GlobalApiConfig.APP_HEADER_CONFIG;
 
     export default {
         name: "app-header",
         props: {
-            useBack: {default: true},
             title: {
                 default: ""
             },
@@ -53,7 +53,7 @@
                     width: "100px"
                 }
             },
-            backIconUrl: {default: weexUtils.getResourcesURL(appHeaderConfig.backImage, weex)},
+            backIconUrl: {default: weexUtils.getResourcesURL(appHeaderConfig.backImage)},
             headerStyle: {default: {}},
             headerIosTopStyle: {default: {}},
             headerTitleStyle: {default: {}},
@@ -67,7 +67,10 @@
                 rightTextStyle: {
                     right: "15px",
                     fontSize: "32px",
-                    color: ": #ffffff"
+                    top: "34",
+                    lineHeight:"32px",
+                    height:"32px",
+                    color: "#ffffff"
                 },
                 rightIconStyle: {
                     right: "22px",
@@ -89,19 +92,23 @@
             }
         },
         created() {
-            this.ios = weex.config.env.platform.toLowerCase() === "ios";
+            this.ios = isIos();
             this.style = Object.assign({}, this.style, this.headerStyle);
             this.backStyle = Object.assign(this.backStyle, this.leftStyle);
             if (this.style.height) {
                 this.backStyle.height = this.style.height;
             }
-            this.iosTopStyle = Object.assign({}, this.iosTopStyle, this.headerIosTopStyle);
+
             this.titleStyle = Object.assign({fontSize:"36px"}, this.titleStyle, this.headerTitleStyle);
             if (this.rightText.length > 0) {
                 this.rightTextStyle = Object.assign({}, this.rightTextStyle, this.headerRightStyle);
             } else {
                 this.rightIconStyle = Object.assign({}, this.rightIconStyle, this.headerRightStyle);
             }
+
+            this.iosTopStyle = Object.assign({}, this.iosTopStyle, {
+                height:getIosTopHeight()+"px"
+            }, this.headerIosTopStyle);
         }
     }
 </script>

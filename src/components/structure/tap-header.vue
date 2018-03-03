@@ -2,79 +2,114 @@
     <div>
         <div v-if="ios" class="ios_top" :style="iosTopStyle"></div>
         <div class="header" :style="style">
-            <div @click="clickBackButton" :style="style" class="left-back" v-if="isShow">
+            <div @click="clickBackButton" :style="backStyle" class="left-back" v-if="backIconUrl">
                 <image class="back" :src="backIconUrl"></image>
+                <text v-if="leftText" :style="leftTextStyle">{{leftText}}</text>
             </div>
             <div class="tap-list">
-                <text class="left_tap_item"
+                <text class="tap_item"
                       :style="tabs[0].style"
-                      @click="changeTap">{{tabs[0].text}}</text>
-                <text class="right_tap_item"
+                      @click="changeTap(0)" :value="tabs[0].text">
+                </text>
+                <text class="tap_item"
                       :style="tabs[1].style"
-                      @click="changeTap">{{tabs[1].text}}</text>
+                      @click="changeTap(1)" :value="tabs[1].text">
+                </text>
             </div>
-            <image v-if="useRight==='image'" @click="clickRight"
-                   :src="rightContent"
-                   :style="rightContentStyle"
-                   class="right-icon"></image>
-            <text v-if="useRight==='text'" @click="clickRight"
-                  class="right-text" :style="rightContentStyle">{{rightContent}}
-            </text>
+            <image v-if="rightIcon.length>0"
+                   class="right-content"
+                   @click="clickRight"
+                   :style="rightIconStyle"
+                   :src="rightIcon">
+            </image>
         </div>
     </div>
 </template>
 
 <script>
     import weexUtils from "../../utils/WeexUtils";
+    import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
+    import {isIos,getIosTopHeight} from "../../utils/FlexViewUtils";
+
+    const appHeaderConfig = GlobalApiConfig.APP_HEADER_CONFIG;
 
     export default {
-        name: "app-tap-header",
+        name: "app-header",
         props: {
-            backIconUrl: {default: weexUtils.getResourcesURL("images/buyer/back_icon.png", weex)},
-            isShow: {default: true},
-            title: {default: ''},
-            rightContent: {default: ""},
-            useRight: {default: "image"},
+            tabs: {default: []},
+            tabSelectedIndex: {default: 0},
+            rightText: {default: ""},
+            rightIcon: {default: ""},
+            leftText: {default: ""},
+            leftTextStyle: {
+                default: {
+                    fontSize: "32px",
+                    color: "#ffffff"
+                }
+            },
+            leftStyle: {
+                default: {
+                    width: "100px"
+                }
+            },
+            backIconUrl: {default: weexUtils.getResourcesURL(appHeaderConfig.backImage)},
             headerStyle: {default: {}},
             headerIosTopStyle: {default: {}},
-            headerRightImageStyle: {default: {}},
-            tabs:{default:[]},
-            tabSelectedIndex:{default:0}
+            headerTitleStyle: {default: {}},
+            headerRightStyle: {default: {}}
         },
-        data(){
-            return {
-                style: {
-                    height: "100px",
-                    backgroundColor: "#F4F4F4",
-                    borderBottomColor: "#E2E2E2"
+        data() {
+            let result = appHeaderConfig.data;
+            result.ios = isIos();
+            return Object.assign({
+                backStyle: {height: "100px"},
+                rightTextStyle: {
+                    right: "15px",
+                    fontSize: "32px",
+                    top: "34",
+                    lineHeight:"32px",
+                    height:"32px",
+                    color: "#ffffff"
                 },
-                iosTopStyle: {
-                    height: "28px",
-                    backgroundColor: "#F4F4F4"
-                },
-                rightContentStyle:{},
-                ios: false
-            }
+                rightIconStyle: {
+                    right: "22px",
+                    top: "22px",
+                    width: " 56px",
+                    height: "56px"
+                }
+            }, result);
         },
         methods: {
             clickBackButton: function () {
                 this.$emit("backPage");
             },
-            clickText(){
+            clickText() {
                 this.$emit("clickHeaderText");
             },
-            clickRight(){
+            clickRight() {
                 this.$emit("clickHeaderRightText");
             },
-            changeTap(){
-                this.$emit("tabChange");
+            changeTap(index) {
+                this.$emit("tabChange",index);
             }
         },
-        created(){
-            this.ios = weex.config.env.platform.toLowerCase() === "ios";
-            this.style = Object.assign(this.style, this.headerStyle);
-            this.iosTopStyle = Object.assign(this.iosTopStyle, this.headerIosTopStyle);
-            this.rightContentStyle = Object.assign(this.rightContentStyle, this.headerRightImageStyle);
+        created() {
+            this.style = Object.assign({}, this.style, this.headerStyle);
+            this.backStyle = Object.assign(this.backStyle, this.leftStyle);
+            if (this.style.height) {
+                this.backStyle.height = this.style.height;
+            }
+
+            this.titleStyle = Object.assign({fontSize:"36px"}, this.titleStyle, this.headerTitleStyle);
+            if (this.rightText.length > 0) {
+                this.rightTextStyle = Object.assign({}, this.rightTextStyle, this.headerRightStyle);
+            } else {
+                this.rightIconStyle = Object.assign({}, this.rightIconStyle, this.headerRightStyle);
+            }
+
+            this.iosTopStyle = Object.assign({}, this.iosTopStyle, {
+                height:getIosTopHeight()+"px"
+            }, this.headerIosTopStyle);
         }
     }
 </script>
@@ -89,9 +124,6 @@
         justify-content: center;
         align-items: center;
         position: relative;
-        font-size: 36px;
-        border-bottom-width: 1px;
-        border-bottom-style: solid;
 
     }
 
@@ -101,59 +133,34 @@
     }
 
     .left-back {
+        flex-direction: row;
         position: absolute;
-        width: 100px;
         justify-content: center;
         align-items: center;
         left: 0;
         top: 0;
     }
 
+
     .tap-list {
         height: 60px;
-        border-width: 1px;
-        border-color: #43B453;
-        border-style: solid;
-        border-radius: 20px;
         flex-direction: row;
         justify-content: center;
         align-items: center;
     }
 
-    .left_tap_item {
+    .tap_item {
         font-size: 30px;
         height: 58px;
+        line-height: 58px;
+
         padding-left: 15px;
         padding-right: 15px;
-        line-height: 58px;
-        border-top-left-radius: 20px;
-        border-bottom-left-radius: 20px;
+
     }
 
-    .right_tap_item {
-        font-size: 30px;
-        height: 58px;
-        padding-left: 15px;
-        padding-right: 15px;
-        line-height: 58px;
-        border-top-right-radius: 20px;
-        border-bottom-right-radius: 20px;
-    }
-
-    .right-icon {
+    .right-content {
         position: absolute;
-        right: 25px;
-        top: 30px;
-        width: 40px;
-        height: 40px;
-    }
-
-    .right-text {
-        position: absolute;
-        right: 15px;
-        top: 32px;
-        font-size: 32px;
-        color: #ffffff;
     }
 
 </style>

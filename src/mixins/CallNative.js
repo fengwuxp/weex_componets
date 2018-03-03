@@ -1,7 +1,7 @@
 /**
  * Created by wuxp on 2017/6/21.
  */
-import {appMain} from "../utils/ExportWeexModel";
+import {appMain} from "typescript_api_sdk/src/utils/ExpotrtWeexCustomModel";
 
 
 export default {
@@ -61,7 +61,7 @@ export default {
                     return Promise.resolve(this.jump("/search", {keyword: encodeURI(actionValue)}));
                 case "CLASS_ID":
                     //分类id
-                    paramMap = Object.assign({}, {category_id: parseInt(actionValue)});
+                    paramMap = Object.assign({}, {category_id: actionValue});
                     break;
                 case "SEARCH_STORE_GOODS":
                     //店内搜索

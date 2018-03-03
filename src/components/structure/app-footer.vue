@@ -5,7 +5,7 @@
 </template>
 
 <script>
-    import  GlobalApiConfig from "../../api/config/GlobalAipConfig";
+    import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
     const appHeaderConfig = GlobalApiConfig.APP_FOOTER_CONFIG;
     export default{
         props:{

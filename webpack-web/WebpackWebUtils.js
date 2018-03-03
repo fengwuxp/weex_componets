@@ -41,7 +41,7 @@ const getBaseConfig = function (config = {
                     exclude: isExclude
                 }, {
                     test: /\.vue(\?[^?]+)?$/,
-                    loaders: []
+                    use: []
                 },
                 {
                     test: /\.ts[x]?$/,

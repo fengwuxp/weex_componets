@@ -5,7 +5,7 @@
  *
  **/
 
-import {photo} from "../utils/ExportWeexModel";
+import {photo} from "typescript_api_sdk/src/utils/ExpotrtWeexCustomModel";
 
 export default {
 

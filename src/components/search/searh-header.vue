@@ -26,13 +26,13 @@
 </template>
 <script>
 
-    import weexUtils from "wxp_weex_componets/src/utils/WeexUtils";
+    import weexUtils from "../../utils/WeexUtils";
 
     export default{
         props: {
-            backIconURL: {default: weexUtils.getResourcesURL("/images/buyer/back_icon.png", weex)},
-            searchIconURL: {default: weexUtils.getResourcesURL("/images/buyer/search_icon.png", weex)},
-            clearIconURL: {default: weexUtils.getResourcesURL("/images/buyer/clear_icon.png", weex)},
+            backIconURL: {default: weexUtils.getResourcesURL("/images/buyer/back_icon.png")},
+            searchIconURL: {default: weexUtils.getResourcesURL("/images/buyer/search_icon.png")},
+            clearIconURL: {default: weexUtils.getResourcesURL("/images/buyer/clear_icon.png")},
             rightShow: {default: true},
             clearShow: {default: false},
             inputFocus: {default: true},

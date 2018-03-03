@@ -1,5 +1,7 @@
 <template>
-    <div class="app" :style="viewStyle">
+    <div class="app" :style="viewStyle"
+         @viewappear="reportUMengByIntoPage"
+         @viewdisappear="reportUMengByDestroy">
         <div class="app_header" :style="headerStyle" v-if="view.useHeader">
             <slot name="app-header"></slot>
         </div>
@@ -16,36 +18,40 @@
 </template>
 <script>
     import fadeIn from '../mixins/FadeIn';
-    export default{
-        mixins: [fadeIn],
+    import UmengMixin from '../mixins/UmengMixin';
+    import {DEFAULT_FOOTER_HEIGHT, DEFAULT_HEADER_HEIGHT, getViewFooterStyle} from "../utils/FlexViewUtils";
+
+    export default {
+        mixins: [fadeIn, UmengMixin],
         props: {
             view: {
                 type: Object,
                 default: function () {
                     return {
-                        viewStyle:{flex:"1"},
+                        viewStyle: {flex: "1"},
                         bodyScroll: false,   //页面主体是否可以滚动
                         bodyPadding: true,   //页面主体是否需要左右padding (默认20)
                         bodyIsCenter: true,  //页面主体内容是否居中(水平和垂直)
                         bodyBackgroundColor: "#f2f2f2", //页面主体背景色
                         useHeader: true,     //是否使用页面头部
                         useFooter: true,     //是否使用页面底部
-                        headerHeight: "100px", //页面头部高度
-                        footerHeight: "80px",   //页面底部高度
-                        scrollerStyle:{flex:"1"}
+                        headerHeight: DEFAULT_HEADER_HEIGHT, //页面头部高度
+                        footerHeight: DEFAULT_FOOTER_HEIGHT,   //页面底部高度
+                        scrollerStyle: {flex: "1"}
                     }
                 }
             }
         },
-        data(){
+        data() {
             const {headerHeight, footerHeight, bodyBackgroundColor, bodyPadding, bodyIsCenter} = this.view;
             const headerStyle = {
-                height: headerHeight
+                height: headerHeight + "px"
             };
-            const footerStyle = {
-                height: footerHeight,
-                backgroundColor: bodyBackgroundColor
-            };
+            const footerStyle = Object.assign({
+                ...getViewFooterStyle(footerHeight),
+                backgroundColor: bodyBackgroundColor,
+            });
+
             const bodyStyle = {
                 backgroundColor: bodyBackgroundColor,
             };
@@ -74,6 +80,7 @@
     .app_header {
         justify-content: flex-start;
     }
+
     .app_body {
         flex: 1;
         flex-direction: column;

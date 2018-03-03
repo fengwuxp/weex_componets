@@ -43,11 +43,8 @@ export default {
          */
         queryActionEnd(length = 0) {
             this.setQueryLoading(false);
-            if (length === 0 || length < this.pageInfo.querySize) {
-                this.setQueryEnd(true);
-            } else {
-                this.getPageInfo().queryPage++;
-            }
+            this.setQueryEnd(length < this.pageInfo.querySize);
+            this.pageInfo.queryPage++;
         },
         queryIsLock() {
             return this.queryStatus.loading || this.queryStatus.end;

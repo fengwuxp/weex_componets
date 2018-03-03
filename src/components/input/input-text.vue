@@ -38,7 +38,7 @@
                 }
             },
             leftText: {
-                detault: ""
+                default: ""
             },
             leftTextStyle: {
                 default: {
@@ -48,7 +48,7 @@
                 }
             },
             clearIconURL: {
-                default: weexUtils.getResourcesURL("images/clear_icon.png", weex)
+                default: weexUtils.getResourcesURL("images/clear_icon.png")
             },
             clearIconStyle: {
                 default: {
@@ -108,7 +108,7 @@
 
                 //检查输入
                 if (this.checkValue && this.checkValue.constructor === Function) {
-                    this.checkValue(() => {
+                    this.checkValue({value},() => {
                         this.setValue("");
                     });
                 }

@@ -1,5 +1,5 @@
 # Created by .ignore support plugin (hsz.mobi)
-
-.idea/
-.svn/
-node_modules/
+.idea
+node_modules
+test
+package-lock.json

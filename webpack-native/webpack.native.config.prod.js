@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const nativeCOnfig = require("./webpack.native.config");
-const envConfig = require("../../../webpack-config/WebpackConfig");
+const {PROD_API_ADDRESS, PROD_H5_WEB_CONTEXT} = require("../../../webpack-config/WebpackConfig");
 
 nativeCOnfig.plugins.unshift(new UglifyJsPlugin({
     // 最紧凑的输出
@@ -21,8 +21,10 @@ nativeCOnfig.plugins.unshift(new UglifyJsPlugin({
     }
 }), new webpack.DefinePlugin({
     'process.env': {
+        IS_WEB: false,
         NODE_ENV: '"prod"',
-        API_ROOT: JSON.stringify(envConfig.PROD_API_ADDRESS)
+        API_ROOT: JSON.stringify(PROD_API_ADDRESS),
+        H5_WEB_CONTEXT: JSON.stringify(PROD_H5_WEB_CONTEXT)
     }
 }));
 

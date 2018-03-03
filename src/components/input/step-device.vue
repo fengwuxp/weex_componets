@@ -21,12 +21,12 @@
 </template>
 <script>
     import weexUtils from "../../utils/WeexUtils";
-    import {timer} from "../../utils/ExportWeexModel";
+    import {timer} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 
-    const ADD_ICON_URL = weexUtils.getResourcesURL("images/storehome_icon_add@2x.png", weex);
-    const ADD_ICON_DISABLED_URL = weexUtils.getResourcesURL("images/storehome_icon_add_disable@2x.png", weex);
-    const DECREASE_ICON_URL = weexUtils.getResourcesURL("images/storehome_icon_decrease@2x.png", weex);
-    const DECREASE_ICON_DISABLED_URL = weexUtils.getResourcesURL("images/storehome_icon_decrease_disable@2x.png", weex);
+    const ADD_ICON_URL = weexUtils.getResourcesURL("images/storehome_icon_add@2x.png");
+    const ADD_ICON_DISABLED_URL = weexUtils.getResourcesURL("images/storehome_icon_add_disable@2x.png");
+    const DECREASE_ICON_URL = weexUtils.getResourcesURL("images/storehome_icon_decrease@2x.png");
+    const DECREASE_ICON_DISABLED_URL = weexUtils.getResourcesURL("images/storehome_icon_decrease_disable@2x.png");
     /**
      * 节流函数
      * @param times

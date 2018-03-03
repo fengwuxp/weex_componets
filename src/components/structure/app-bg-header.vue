@@ -1,7 +1,7 @@
 <!--带有背景图的顶部导航-->
 <template>
     <div class="header_container" :style="containerStyle">
-        <image :src="bgImageURL" class="bg_all" :style="bgImageStyle"></image>
+        <image v-if="bgImageURL" :src="bgImageURL" class="bg_all" :style="bgImageStyle"></image>
         <div v-if="ios" :style="iosTopStyle"></div>
         <div class="header" :style="headerStyle">
             <div @click="clickBackButton"
@@ -38,7 +38,8 @@
 
 <script>
     import weexUtils from "../../utils/WeexUtils";
-    import GlobalApiConfig from "../../api/config/GlobalAipConfig";
+    import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
+    import {isIos,getIosTopHeight,getViewHeaderHeight} from "../../utils/FlexViewUtils";
 
     const appHeaderConfig = GlobalApiConfig.APP_HEADER_CONFIG;
 
@@ -68,11 +69,11 @@
             },
             iosTopStyle: {
                 default: {
-                    height: "28px",
+                    height: getIosTopHeight()+"px",
                     backgroundColor: "transparent"
                 }
             },
-            backIconUrl: {default: weexUtils.getResourcesURL(appHeaderConfig.backImage, weex)},
+            backIconUrl: {default: weexUtils.getResourcesURL(appHeaderConfig.backImage)},
             backStyle: {
                 default: {
                     width: "40px",
@@ -82,31 +83,31 @@
             bgImageStyle: {
                 default: {}
             },
-            bgImageURL: {default: weexUtils.getResourcesURL(appHeaderConfig.bagImageURL, weex)},
+            bgImageURL: {default: weexUtils.getResourcesURL(appHeaderConfig.bagImageURL)},
             rightTextStyle: {
-                default: {
-                    right: "15px",
-                    fontSize: "32px",
-                    color: ": #ffffff"
-                }
+                right: "15px",
+                fontSize: "32px",
+                top: "34",
+                lineHeight:"32px",
+                height:"32px",
+                color: "#ffffff"
             },
             rightIconStyle: {
                 default: {
                     right: "20px",
-                    top: "20px",
-                    width: " 60px",
-                    height: "60px"
+                    top: "25px",
+                    width: " 50px",
+                    height: "50px"
                 }
             }
         },
         data() {
-            let ios = weex.config.env.platform.toLowerCase() === 'ios';
+            let ios = isIos();
 
             return {
                 headerStyle: {},
                 containerStyle: {},
-                ios,
-                iosTop: 28
+                ios
             }
         },
         methods: {
@@ -121,14 +122,12 @@
             }
         },
         beforeMount() {
-            let height = this.headerHeight;
             if (this.ios) {
-                height += this.iosTop;
                 this.bgImageURL = this.bgImageURL.replace("bg", "ios-bg");
             }
-            this.containerStyle = {
-                height: height + "px"
-            };
+            this.containerStyle =  Object.assign({},{
+                height:getViewHeaderHeight()+"px"
+            }, this.headerIosTopStyle);
             this.headerStyle.height = this.headerHeight + "px";
         }
     }
