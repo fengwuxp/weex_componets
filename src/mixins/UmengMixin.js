@@ -1,10 +1,9 @@
 import {reportUMengByDestroy, reportUMengByIntoPage} from "../third/umeng/UmengReportUtils"
-import {weexModule} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 import commonUtils from "../utils/CommonUtils";
 import weexUtils from "../utils/WeexUtils";
 
 const getCurrentPageSign = (headerTitle) => {
-    const bundleUrl = weexModule.config.bundleUrl;
+    const bundleUrl = weex.config.bundleUrl;
     const basePath = weexUtils.getBasePath();
     let uri = bundleUrl.replace(basePath, "").split("?")[0];
     if (commonUtils.isNullOrUndefined(headerTitle)) {

@@ -58,7 +58,7 @@
         data() {
             const {headerHeight, footerHeight, bodyBackgroundColor, bodyPadding, bodyIsCenter} = this.view;
             const headerStyle = {
-                height: headerHeight + "px"
+                height: headerHeight
             };
             const footerStyle = Object.assign({
                 ...getViewFooterStyle(footerHeight),
@@ -69,8 +69,8 @@
                 backgroundColor: bodyBackgroundColor,
             };
             if (bodyPadding) {
-                bodyStyle.paddingLeft = "20px";
-                bodyStyle.paddingRight = "20px";
+                bodyStyle.paddingLeft = 20;
+                bodyStyle.paddingRight = 20;
             }
             if (bodyIsCenter) {
                 bodyStyle.justifyContent = "center";

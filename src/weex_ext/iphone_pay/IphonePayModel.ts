@@ -1,10 +1,9 @@
 import {InAppPay, PermissionCheck} from "./index";
-import {weexModule} from "typescript_api_sdk/src/utils/ExportWeexSdkModel.js";
 
 
-const inAppPay: InAppPay = weexModule.requireModule("inAppPay");
+const inAppPay: InAppPay = weex.requireModule("inAppPay");
 
-const permissionCheck: PermissionCheck = weexModule.requireModule("permissionCheck");
+const permissionCheck: PermissionCheck = weex.requireModule("permissionCheck");
 
 export {
     inAppPay,

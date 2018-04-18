@@ -1,9 +1,9 @@
-import {weexModule} from "typescript_api_sdk/src/utils/ExportWeexSdkModel.js";
+import {isWeb} from "typescript_api_sdk/src/utils/WeexEnvUtil";
 
 /**
  * 友盟
  */
-if (weexModule.config.env.platform.toLowerCase() === 'web') {
+if (isWeb()) {
 
     const umeng = {
         /**
@@ -56,5 +56,5 @@ if (weexModule.config.env.platform.toLowerCase() === 'web') {
         }
     };
     console.log("注册自定义模块 umeng");
-    weexModule.registerModule('umeng', umeng);
+    weex.registerModule('umeng', umeng);
 }

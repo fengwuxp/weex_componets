@@ -1,7 +1,7 @@
 import weexGetPathUtils from "../utils/WeexGetPathUtils";
 import weexUtils from "../utils/WeexUtils";
 import commonUtils from "../utils/CommonUtils";
-import {navigator, weexModule} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
+import {navigator} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 //导入原生路由配置
 import nativeRoute from '../../../../src/router/RouterNativeMaps';
 import StringToHexUtil from "typescript_api_sdk/src/codec/StringToHexUtil";

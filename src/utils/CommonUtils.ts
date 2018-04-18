@@ -1,7 +1,7 @@
 /**
  * Created by wuxp on 2017/6/6.
  */
-import {isNullOrUndefined, isString, isNumber} from "util";
+import {isNullOrUndefined, isString, isNumber, isBoolean} from "util";
 
 const moneyRegExp = /^[0-9]+[\.]?[0-9]{0,2}$/;
 
@@ -15,7 +15,7 @@ class CommonUtils {
      * @param value
      * @return {boolean}
      */
-    isMoney = (value: any): Boolean => {
+    isMoney = (value: any): boolean => {
 
         if (value === null) {
             return true;
@@ -35,18 +35,18 @@ class CommonUtils {
     /**
      * 对象是否为空或者null
      * @param obj
-     * @return {Boolean}
+     * @return {boolean}
      */
-    isNullOrUndefined = (obj: any): Boolean => {
+    isNullOrUndefined = (obj: any): boolean => {
         return isNullOrUndefined(obj);
     };
 
     /**
      * 是否为一个空对象
      * @param obj
-     * @return {Boolean}
+     * @return {boolean}
      */
-    isEmptyObject = (obj: any): Boolean => {
+    isEmptyObject = (obj: any): boolean => {
         if (isNullOrUndefined(obj)) {
             return true;
         }
@@ -59,12 +59,16 @@ class CommonUtils {
                 return true;
             }
         }
-        if (isNumber(obj) && isNaN(obj)) {
-            return true;
+        if (isNumber(obj)) {
+            return isNaN(obj);
+        }
+        if (isBoolean(obj)) {
+            return false;
         }
         for (let k in obj) {
             return false
         }
+
         return true;
     };
 
@@ -73,7 +77,7 @@ class CommonUtils {
      * @param {String} val
      * @return {number}
      */
-    trim = (val: String): String => {
+    trim = (val: String): string => {
         if (this.isNullOrUndefined(val)) {
             return "";
         }
@@ -86,9 +90,9 @@ class CommonUtils {
     /**
      * 字符串是否有内容
      * @param {String} val
-     * @return {Boolean}
+     * @return {boolean}
      */
-    hasText = (val: String): Boolean => {
+    hasText = (val: String): boolean => {
         return this.trim(val).length > 0;
     }
 }

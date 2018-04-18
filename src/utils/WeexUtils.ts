@@ -1,13 +1,14 @@
 import {isNullOrUndefined, isString} from "util";
-import {storage, modal, timer, weexModule} from "typescript_api_sdk/src/utils/ExportWeexSdkModel.js";
+import {storage, modal, timer} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 import {cache} from "typescript_api_sdk/src/utils/ExpotrtWeexCustomModel";
-import "typescript_api_sdk/src/api/PromiseExt";
 import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
 import {getViewHeaderHeight, DEFAULT_FOOTER_HEIGHT} from "./FlexViewUtils";
 import StringToHexUtil from "typescript_api_sdk/src/codec/StringToHexUtil";
 import {DEFAULT_PARAM_KEY_NAME} from "../mixins/ConstKey";
 import {FlexViewConfig} from "../components/FlexViewConfig";
 import commonUtils from "./CommonUtils";
+import {WeexAlertOptions} from "weex/src/sdk/model/modal";
+import "typescript_api_sdk/src/api/PromiseExt";
 
 /**
  * 工具类
@@ -54,7 +55,7 @@ class WeexUtils {
      * @return {string} weexURL路径
      */
     getBasePath(): string {
-        const bundleUrl = weexModule.config.bundleUrl;
+        const bundleUrl = weex.config.bundleUrl;
         //console.log("-bundleUrl->"+bundleUrl);
         let nativeBase;
         let isAndroidAssets = bundleUrl.indexOf('file://assets/') >= 0;
@@ -221,13 +222,13 @@ class WeexUtils {
         if (isString(options)) {
             options = {message: options}
         }
-        options = Object.assign({
+        let weexOptions:WeexAlertOptions= Object.assign({
             message: "",
             duration: 1,
             okTitle: "确认",
             cancelTitle: "取消"
         }, options);
-        modal.alert(options, callback)
+        modal.alert(weexOptions, callback)
     };
 
     /**

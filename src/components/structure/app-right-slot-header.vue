@@ -29,7 +29,7 @@
 
     const appHeaderConfig = GlobalApiConfig.APP_HEADER_CONFIG;
 
-    const bagImageURL = appHeaderConfig.bagImageURL ? appHeaderConfig.bagImageURL : "";
+    const bgImageURL = appHeaderConfig.bgImageURL ? appHeaderConfig.bgImageURL : "";
 
     export default {
         name: "app-header",
@@ -56,7 +56,7 @@
             bgImageStyle: {
                 default: {}
             },
-            bgImageURL: {default: weexUtils.getResourcesURL(bagImageURL)},
+            bgImageURL: {default: weexUtils.getResourcesURL(bgImageURL)},
             headerStyle: {default: {}},
             headerIosTopStyle: {default: {}},
             headerTitleStyle: {default: {}},
@@ -69,7 +69,7 @@
                 backStyle: {height: DEFAULT_HEADER_HEIGHT},
                 style,
                 iosTopStyle: Object.assign({
-                    height: getIosTopHeight(),
+                    height: getIosTopHeight()
                 }, appHeaderConfig.data.iosTopStyle)
             });
         },

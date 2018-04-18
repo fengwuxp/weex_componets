@@ -39,16 +39,13 @@
 <script>
     import weexUtils from "../../utils/WeexUtils";
     import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
-    import {isIos,getIosTopHeight,getViewHeaderHeight} from "../../utils/FlexViewUtils";
+    import {isIos, DEFAULT_HEADER_HEIGHT, getIosTopHeight, getViewHeaderHeight} from "../../utils/FlexViewUtils";
 
     const appHeaderConfig = GlobalApiConfig.APP_HEADER_CONFIG;
 
     export default {
         name: "app-header",
         props: {
-            headerHeight: {
-                default: 100
-            },
             title: {default: ''},
             titleStyle: {
                 default: appHeaderConfig.titleStyle
@@ -58,54 +55,55 @@
             leftText: {default: ""},
             leftTextStyle: {
                 default: {
-                    fontSize: "32px",
+                    fontSize: 32,
                     color: "#ffffff"
                 }
             },
             leftStyle: {
                 default: {
-                    width: "100px"
+                    width: 100
                 }
             },
             iosTopStyle: {
                 default: {
-                    height: getIosTopHeight()+"px",
+                    height: getIosTopHeight(),
                     backgroundColor: "transparent"
                 }
             },
             backIconUrl: {default: weexUtils.getResourcesURL(appHeaderConfig.backImage)},
             backStyle: {
                 default: {
-                    width: "40px",
-                    height: "40px",
+                    width: 40,
+                    height: 40,
                 }
             },
             bgImageStyle: {
                 default: {}
             },
-            bgImageURL: {default: weexUtils.getResourcesURL(appHeaderConfig.bagImageURL)},
+            bgImageURL: {default: weexUtils.getResourcesURL(appHeaderConfig.bgImageURL)},
             rightTextStyle: {
-                right: "15px",
-                fontSize: "32px",
-                top: "34",
-                lineHeight:"32px",
-                height:"32px",
+                right: 15,
+                fontSize: 32,
+                top: 34,
+                lineHeight: 32,
+                height: 32,
                 color: "#ffffff"
             },
             rightIconStyle: {
                 default: {
-                    right: "20px",
-                    top: "25px",
-                    width: " 50px",
-                    height: "50px"
+                    right: 20,
+                    top: 25,
+                    width: 50,
+                    height: 50
                 }
             }
         },
         data() {
             let ios = isIos();
-
             return {
-                headerStyle: {},
+                headerStyle: {
+                    height: DEFAULT_HEADER_HEIGHT
+                },
                 containerStyle: {},
                 ios
             }
@@ -125,10 +123,6 @@
             if (this.ios) {
                 this.bgImageURL = this.bgImageURL.replace("bg", "ios-bg");
             }
-            this.containerStyle =  Object.assign({},{
-                height:getViewHeaderHeight()+"px"
-            }, this.headerIosTopStyle);
-            this.headerStyle.height = this.headerHeight + "px";
         }
     }
 </script>

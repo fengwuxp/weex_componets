@@ -1,6 +1,6 @@
 <!--带有背景图的 左侧为slot的 顶部导航-->
 <template>
-    <div class="header_container" :style="containerStyle">
+    <div class="header_container">
         <image v-if="bgImageURL" :src="bgImageURL" class="bg_all" :style="bgImageStyle"></image>
         <div v-if="ios" :style="iosTopStyle"></div>
         <div class="header" :style="style">
@@ -37,14 +37,11 @@
 
     const appHeaderConfig = GlobalApiConfig.APP_HEADER_CONFIG;
 
-    const bagImageURL = appHeaderConfig.bagImageURL ? appHeaderConfig.bagImageURL : "";
+    const bgImageURL = appHeaderConfig.bgImageURL ? appHeaderConfig.bgImageURL : "";
 
     export default {
         name: "app-header",
         props: {
-            headerHeight: {
-                default: 100
-            },
             title: {default: ""},
             rightText: {default: ""},
             rightIcon: {default: ""},
@@ -59,7 +56,7 @@
                 fontSize: 32,
                 top: 34,
                 lineHeight: 32,
-                height:32,
+                height: 32,
                 color: "#ffffff"
             }, appHeaderConfig.data.rightTextStyle),
             rightIconStyle: {
@@ -73,19 +70,18 @@
             bgImageStyle: {
                 default: {}
             },
-            bgImageURL: {default: weexUtils.getResourcesURL(bagImageURL)},
+            bgImageURL: {default: weexUtils.getResourcesURL(bgImageURL)},
             headerIosTopStyle: {default: {}},
         },
         data() {
             let ios = isIos();
-            const {style}=appHeaderConfig.data;
+            const {style} = appHeaderConfig.data;
             return {
                 headerStyle: {},
-                containerStyle: {},
                 ios,
                 style,
                 iosTopStyle: Object.assign({
-                    height: getIosTopHeight(),
+                    height: getIosTopHeight()
                 }, appHeaderConfig.data.iosTopStyle),
             }
         },
@@ -102,10 +98,6 @@
             if (this.ios) {
                 this.bgImageURL = this.bgImageURL.replace("bg", "ios-bg");
             }
-            this.containerStyle =  Object.assign({},{
-                height:getViewHeaderHeight()+"px"
-            }, this.headerIosTopStyle);
-            this.headerStyle.height = this.headerHeight + "px";
         }
     }
 </script>

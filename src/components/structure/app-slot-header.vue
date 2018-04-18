@@ -27,13 +27,13 @@
             leftText: {default: ""},
             leftTextStyle: {
                 default: {
-                    fontSize: "32px",
+                    fontSize: 32,
                     color: "#ffffff"
                 }
             },
             leftStyle: {
                 default: {
-                    width: "100px"
+                    width: 100
                 }
             },
             backIconUrl: {default: weexUtils.getResourcesURL(appHeaderConfig.backImage)},
@@ -52,7 +52,7 @@
             let result = appHeaderConfig.data;
             result.ios = false;
             return Object.assign({
-                backStyle: {height: DEFAULT_HEADER_HEIGHT + "px"},
+                backStyle: {height: DEFAULT_HEADER_HEIGHT },
             }, result);
         },
         methods: {
@@ -63,7 +63,7 @@
         created() {
             this.ios = weex.config.env.platform.toLowerCase() === "ios";
             this.style = Object.assign({
-                paddingRight: "20px"
+                paddingRight: 20
             }, this.style, this.headerStyle);
             this.backStyle = Object.assign(this.backStyle, this.leftStyle);
             if (this.style.height) {

@@ -1,10 +1,8 @@
-import {weexModule} from "typescript_api_sdk/src/utils/ExportWeexSdkModel.js";
-
-
+import {isWeb} from "typescript_api_sdk/src/utils/WeexEnvUtil";
 /**
  * 自定义wheel picker
  */
-if (weexModule.config.env.platform.toLowerCase() === 'web') {
+if (isWeb()) {
     let Vue = window['Vue'];
     const VuePicker = require("../components/picker/picker.vue");
 
@@ -62,5 +60,5 @@ if (weexModule.config.env.platform.toLowerCase() === 'web') {
         }
     };
     console.log("注册自定义模块 wheelPicker");
-    weexModule.registerModule('wheelPicker', wheelPicker);
+    weex.registerModule('wheelPicker', wheelPicker);
 }

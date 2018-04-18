@@ -1,4 +1,4 @@
-import {navigator, weexModule} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
+import {navigator} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 //导入原生路由配置
 import nativeRoute from '../../../../src/router/RouterNativeMaps';
 
@@ -19,7 +19,7 @@ const IS_IOS: boolean = isIos();
 let newNavigator: any = navigator;
 if (IS_IOS) {
     //IOS使用自定义的导航模块
-    newNavigator = weexModule.requireModule("nav");
+    newNavigator = weex.requireModule("nav");
 }
 
 /**
@@ -156,7 +156,7 @@ export default class WeexRouterHandler {
         let params: any = {};
         let length: number = keys.length;
         if (IS_WEB) {
-            const bundleUrl: string = weexModule.config.bundleUrl;
+            const bundleUrl: string = weex.config.bundleUrl;
             let queryStr: string = bundleUrl.split("?")[1];  //获取查询字符串
 
             if (!commonUtils.hasText(queryStr)) {

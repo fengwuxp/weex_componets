@@ -29,7 +29,7 @@
 <script>
     import weexUtils from "../../utils/WeexUtils";
     import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
-    import {isIos,getIosTopHeight} from "../../utils/FlexViewUtils";
+    import {isIos, getIosTopHeight} from "../../utils/FlexViewUtils";
 
     const appHeaderConfig = GlobalApiConfig.APP_HEADER_CONFIG;
 
@@ -63,20 +63,20 @@
             let result = appHeaderConfig.data;
             result.ios = false;
             return Object.assign({
-                backStyle: {height: "100px"},
+                backStyle: {height: 100},
                 rightTextStyle: {
-                    right: "15px",
-                    fontSize: "32px",
-                    top: "34",
-                    lineHeight:"32px",
-                    height:"32px",
+                    right: 15,
+                    fontSize: 32,
+                    top: 34,
+                    lineHeight: 32,
+                    height: 32,
                     color: "#ffffff"
                 },
                 rightIconStyle: {
-                    right: "22px",
-                    top: "22px",
-                    width: " 56px",
-                    height: "56px"
+                    right: 20,
+                    top: 25,
+                    width: 50,
+                    height: 50
                 }
             }, result);
         },
@@ -99,7 +99,7 @@
                 this.backStyle.height = this.style.height;
             }
 
-            this.titleStyle = Object.assign({fontSize:"36px"}, this.titleStyle, this.headerTitleStyle);
+            this.titleStyle = Object.assign({fontSize: 36}, this.titleStyle, this.headerTitleStyle);
             if (this.rightText.length > 0) {
                 this.rightTextStyle = Object.assign({}, this.rightTextStyle, this.headerRightStyle);
             } else {
@@ -107,7 +107,7 @@
             }
 
             this.iosTopStyle = Object.assign({}, this.iosTopStyle, {
-                height:getIosTopHeight()+"px"
+                height: getIosTopHeight()
             }, this.headerIosTopStyle);
         }
     }
