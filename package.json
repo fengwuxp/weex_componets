@@ -1,6 +1,6 @@
 {
   "name": "wxp_weex_components",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publishConfig": {
     "registry": "http://nexus.oaknt.com:18081/repository/oak_npm_hosted/"
   },
@@ -13,11 +13,10 @@
   ],
   "author": "wxp",
   "license": "ISC",
-  "dependencies": {
-
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^7.0.16",
+    "@types/weex": "0.0.1",
     "autoprefixer": "^7.2.2",
     "awesome-typescript-loader": "^3.2.2",
     "babel-core": "^6.24.1",
@@ -60,7 +59,7 @@
     "serve": "^5.1.5",
     "style-loader": "^0.13.2",
     "typescript": "^2.7.2",
-    "typescript_api_sdk": "0.0.1",
+    "typescript_api_sdk": "0.0.2",
     "typings": "^2.1.1",
     "vue": "^2.5.3",
     "vue-loader": "^14.1.1",

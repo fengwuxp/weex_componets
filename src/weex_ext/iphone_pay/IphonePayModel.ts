@@ -1,10 +1,9 @@
 import {InAppPay, PermissionCheck} from "./index";
 
 
-const inAppPay: InAppPay = weex.requireModule("inAppPay");
+const inAppPay: InAppPay = weex.requireModule<InAppPay>("inAppPay");
 
-const permissionCheck: PermissionCheck = weex.requireModule("permissionCheck");
-
+const permissionCheck: PermissionCheck = weex.requireModule<PermissionCheck>("permissionCheck") ;
 export {
     inAppPay,
     permissionCheck

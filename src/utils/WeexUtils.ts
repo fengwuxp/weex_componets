@@ -1,15 +1,16 @@
 import {isNullOrUndefined, isString} from "util";
 import {storage, modal, timer} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 import {cache} from "typescript_api_sdk/src/utils/ExpotrtWeexCustomModel";
+import "typescript_api_sdk/src/api/PromiseExt";
 import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
 import {getViewHeaderHeight, DEFAULT_FOOTER_HEIGHT} from "./FlexViewUtils";
 import StringToHexUtil from "typescript_api_sdk/src/codec/StringToHexUtil";
 import {DEFAULT_PARAM_KEY_NAME} from "../mixins/ConstKey";
 import {FlexViewConfig} from "../components/FlexViewConfig";
 import commonUtils from "./CommonUtils";
-import {WeexAlertOptions} from "weex/src/sdk/model/modal";
-import "typescript_api_sdk/src/api/PromiseExt";
+import {WeexConfig} from "typescript_api_sdk/src/config/WeexConfig";
 
+const WeexApiConfig=GlobalApiConfig as WeexConfig;
 /**
  * 工具类
  */
@@ -46,7 +47,7 @@ class WeexUtils {
      */
     getResourcesURL(uri: String): string {
         //return GlobalConfig.DOMAIN + uri + "?123";
-        const basePath = this.getBasePath().replace(GlobalApiConfig.WEB_DEPLOYMENT_DIRECTORY + "/", "");
+        const basePath = this.getBasePath().replace(WeexApiConfig.WEB_DEPLOYMENT_DIRECTORY + "/", "");
         return basePath + uri;//+ "?t_=" + new Date().getTime();
     }
 
@@ -59,13 +60,13 @@ class WeexUtils {
         //console.log("-bundleUrl->"+bundleUrl);
         let nativeBase;
         let isAndroidAssets = bundleUrl.indexOf('file://assets/') >= 0;
-        let isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf(GlobalApiConfig.IOS_PROJECT_NAME) > 0;
+        let isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf(WeexApiConfig.IOS_PROJECT_NAME) > 0;
         if (isAndroidAssets) {
             nativeBase = 'file://assets/js/';
         } else if (isiOSAssets) {
-            nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf(GlobalApiConfig.IOS_PROJECT_NAME + '/')) + GlobalApiConfig.IOS_PROJECT_NAME + "/bundlejs/";
+            nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf(WeexApiConfig.IOS_PROJECT_NAME + '/')) + WeexApiConfig.IOS_PROJECT_NAME + "/bundlejs/";
         } else {
-            let host = GlobalApiConfig.BASE_DOMAIN + '/weex/' + GlobalApiConfig.WEB_DEPLOYMENT_DIRECTORY + '/';
+            let host = WeexApiConfig.BASE_DOMAIN + '/weex/' + WeexApiConfig.WEB_DEPLOYMENT_DIRECTORY + '/';
             nativeBase = 'http://' + host;
         }
 
@@ -98,7 +99,7 @@ class WeexUtils {
      * 移除对象
      * @param key
      */
-    removeItem = (key: string): Promise<Function> => {
+    removeItem = (key: string): Promise<any> => {
         return new Promise((resolve: Function = () => {
         }, reject: Function = () => {
         }) => {
@@ -118,7 +119,7 @@ class WeexUtils {
      * @param expireTime
      * @param needExpireTime
      */
-    setItem = (key: string, data: any, expireTime?: number, needExpireTime: boolean = false): Promise<Function> => {
+    setItem = (key: string, data: any, expireTime?: number, needExpireTime: boolean = false): Promise<any> => {
         const self = this;
         return new Promise((resolve: Function = () => {
         }, reject: Function = () => {
@@ -156,7 +157,7 @@ class WeexUtils {
      */
     getItem = (key: string, verification: Function = (): Boolean => {
         return true;
-    }): Promise<Function> => {
+    }): Promise<any> => {
 
         return new Promise(function (resolve: Function = () => {
         }, reject: Function = () => {
@@ -204,8 +205,7 @@ class WeexUtils {
      * @param callback 回调
      * @param times    提示的时间长度 单位:秒
      */
-    toast = (message: string, callback: Function = () => {
-    }, times: number = 2) => {
+    toast = (message: string, callback?: () => void, times: number = 2) => {
         modal.toast({message: message, duration: times});
         if (callback == null) {
             return;
@@ -222,13 +222,13 @@ class WeexUtils {
         if (isString(options)) {
             options = {message: options}
         }
-        let weexOptions:WeexAlertOptions= Object.assign({
+        options = Object.assign({
             message: "",
             duration: 1,
             okTitle: "确认",
             cancelTitle: "取消"
         }, options);
-        modal.alert(weexOptions, callback)
+        modal.alert(options, callback)
     };
 
     /**

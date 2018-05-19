@@ -13,7 +13,7 @@ const Util = {
         if (isNumber(date)) {
             date = Util.getLocalTime(new Date(date));//new Date(date);
         } else {
-            date = Util.getLocalTime(date);
+            date = Util.getLocalTime(date as Date);
         }
 
         const o = {
@@ -27,7 +27,7 @@ const Util = {
         };
         if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
         for (const k in o)
-            if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            if (new RegExp("(" + k as string + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
         return fmt;
     },
 
@@ -38,7 +38,7 @@ const Util = {
      * @param {number} i  目标时区，i为时区值数字，比如北京为东八区则输入8,西5输入-5,现默认东八区北京时间
      * @return {Date}
      */
-    getLocalTime: (date: Date, i: number = 8,): Date => {
+    getLocalTime: (date: Date, i: number = 8): Date => {
 
         //得到1970年一月一日到现在的秒数
         let local = date.getTime();

@@ -1,6 +1,8 @@
 /**
  * ios支付订单类型
  */
+import {WeexModule} from "weex";
+
 export interface IphonePayOrder {
     order_sn: string;
     member_id: string;
@@ -11,7 +13,7 @@ export interface IphonePayOrder {
 /**
  * ios 支付
  */
-export interface InAppPay {
+export interface InAppPay extends WeexModule{
 
     // 返回：Map={result:"",result_desc:""}
 // //参数不正确
@@ -40,7 +42,7 @@ export interface InAppPay {
 /**
  * 权限检查
  */
-export interface PermissionCheck {
+export interface PermissionCheck extends WeexModule{
     /**
      * 是否有通知权限
      * @param {Function} callback 回调是会传入 boolean结果

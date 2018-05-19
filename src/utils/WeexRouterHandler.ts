@@ -3,13 +3,13 @@ import {navigator} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 import nativeRoute from '../../../../src/router/RouterNativeMaps';
 
 //vue router
-import vueRouter from '../../../../router/RouterIndex';
+import vueRouter from '../../../../src/router/RouterIndex';
 
 import {isIos, isWeb} from "typescript_api_sdk/src/utils/WeexEnvUtil";
 import weexGetPathUtils from "../utils/WeexGetPathUtils";
 import weexUtils from "../utils/WeexUtils";
 import commonUtils from "../utils/CommonUtils";
-import MemberSessionManager from "../../../../../src/session/MemberSessionManagerImpl";
+import MemberSessionManager from "../../../../src/session/MemberSessionManagerImpl";
 
 import StringToHexUtil from "typescript_api_sdk/src/codec/StringToHexUtil";
 import {DEFAULT_PARAM_KEY_NAME} from "../mixins/ConstKey";
