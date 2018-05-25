@@ -1,5 +1,6 @@
 import {LockExecutePlugin} from "./LockExecutePlugin";
 import {isNullOrUndefined} from "util";
+import UUIDUtil from "../../utils/UUIDUtil";
 
 
 interface LockItem {
@@ -35,6 +36,8 @@ export default class TimerLockPlugin implements LockExecutePlugin {
 
     private constructor(times) {
         this.times = times;
+        let key:string = UUIDUtil.guid();
+        this.lock(key);
     }
 
     /**
@@ -43,6 +46,7 @@ export default class TimerLockPlugin implements LockExecutePlugin {
      * @return {TimerLockPlugin}
      */
     public static newInstance(times: number = 1000): TimerLockPlugin {
+
         return new TimerLockPlugin(times);
     }
 

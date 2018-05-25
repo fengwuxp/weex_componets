@@ -1,7 +1,6 @@
 import {isNullOrUndefined, isString} from "util";
 import {storage, modal, timer} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 import {cache} from "typescript_api_sdk/src/utils/ExpotrtWeexCustomModel";
-import "typescript_api_sdk/src/api/PromiseExt";
 import GlobalApiConfig from "typescript_api_sdk/src/config/GlobalAipConfig";
 import {getViewHeaderHeight, DEFAULT_FOOTER_HEIGHT} from "./FlexViewUtils";
 import StringToHexUtil from "typescript_api_sdk/src/codec/StringToHexUtil";
