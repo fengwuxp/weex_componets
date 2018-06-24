@@ -85,9 +85,10 @@
 
                 if (targetItem.targetType === NavItemType.FUNCTION) {
                     //目标是一个函数
-                    if (targetItem.showType === NavShowType.BIG_ICON && isChange) {
-                        this.pageItems = this.getNavItems(index);
-                    }
+                    // if (targetItem.showType === NavShowType.BIG_ICON && isChange) {
+                    //     this.pageItems = this.getNavItems(index);
+                    // }
+                    this.pageItems = this.getNavItems(index);
                 } else {
                     if (isChange) {
                         this.pageItems = this.getNavItems(index);
