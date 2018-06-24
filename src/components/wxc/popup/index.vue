@@ -1,7 +1,7 @@
 <!-- CopyRight (C) 2017-2022 Alibaba Group Holding Limited. -->
 <!-- Created by Tw93 on 16/10/25. -->
 <!--A popup box with customized contents.-->
-
+<!--chang by 2018-05-25 增加center位置支持-->
 <template>
     <div>
         <div @touchend="handleTouchEnd">
@@ -16,7 +16,7 @@
              :height="_height"
              :hack="isNeedShow"
              @click="()=>{}"
-             :class="['wxc-popup', pos]"
+             :class="['wxc-popup',pos]"
              :style="padStyle">
             <slot></slot>
         </div>
@@ -49,12 +49,15 @@
         top: 0;
     }
 
+    .center {
+    }
+
 </style>
 
 <script>
 
     import {isWeb} from "typescript_api_sdk/src/utils/WeexEnvUtil";
-    import {animation, timer} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
+    import {animation, timer, dom} from "typescript_api_sdk/src/utils/ExportWeexSdkModel";
 
     const IS_WEB = isWeb();
     import WxcOverlay from '../overlay/index';
@@ -104,7 +107,9 @@
         },
         data: () => ({
             haveOverlay: true,
-            isOverShow: true
+            isOverShow: true,
+            deviceWidth: 750,
+            deviceHeight: 1344,
         }),
         computed: {
             isNeedShow() {
@@ -144,6 +149,18 @@
                     ...style,
                     right: `${-width}px`
                 });
+
+                if (pos === 'center') {
+                    const {deviceWidth, deviceHeight} = this;
+
+                    style = {
+                        ...style,
+                        left: `${deviceWidth / 2}px`,
+                        top: `${deviceHeight / 2}px`
+                    }
+
+                }
+
                 return style;
             }
         },
@@ -199,8 +216,26 @@
                     case 'right':
                         _transform = `translateX(-${_size}px)`;
                         break;
+                    case 'center':
+                        _transform = bool ? `translate(0,0)` : ` translate(-${width / 2}px,-${height / 2}px)`;
+                        break;
                 }
                 return _transform;
+            }
+        },
+        mounted() {
+            if (this.pos === 'center') {
+                timer.setTimeout(() => {
+                    dom.getComponentRect('viewport', (data) => {
+                        const {result, size} = data;
+                        if (!result) {
+                            return;
+                        }
+                        const {width, height} = size;
+                        this.deviceWidth = width;
+                        this.deviceHeight = height;
+                    });
+                }, 600)
             }
         }
     }

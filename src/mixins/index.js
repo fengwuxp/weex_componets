@@ -169,9 +169,11 @@ export default {
                 i++;
             }
 
+            let isIgnore = queryString.indexOf("weex_refresh=") >= 0 || queryString.indexOf("isCanBack=") >= 0 || queryString.indexOf("fullScreen=") >= 0
+
             queryString = queryString.substr(0, queryString.length - 1);
 
-            if (queryString.trim().length > 0 && commonUtils.isNullOrUndefined(params['weex_refresh'])) {
+            if (queryString.trim().length > 0 && !isIgnore) {
 
                 //转为16进制数据
                 queryString = StringToHexUtil.encode(queryString);

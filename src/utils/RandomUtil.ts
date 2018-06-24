@@ -1,5 +1,5 @@
 /**
- * 存数字的数组
+ * 纯数字的数组
  * @type {number[]}
  */
 const RANDOM_NUMBER_ARRAY: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];

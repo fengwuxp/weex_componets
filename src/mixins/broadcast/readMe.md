@@ -5,6 +5,7 @@
        
          export default{
              props:{
+             onMessage:{
                 default:{
                    //事件类型
                    selected: {
@@ -30,6 +31,7 @@
                                     }
                                 }
                 }
+             }
              }
          }
        

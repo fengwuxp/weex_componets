@@ -78,7 +78,7 @@
              * @param style
              */
             setStyle(style) {
-                this.style = Object.assign(this.style, style);
+                this.style ={...this.style,...style};
                 this.show = true;
                 console.log("图片样式-> " + JSON.stringify(this.style));
             },
@@ -87,6 +87,9 @@
                     naturalWidth,
                     naturalHeight
                 } = size;
+                if (naturalWidth === -1 || naturalHeight === -1) {
+                    return;
+                }
                 this.setSize({
                     imageWidth: naturalWidth,
                     imageHeight: naturalHeight

@@ -1,10 +1,10 @@
-<!--加载结束提示，必须配合list 组件使用-->
+<!--加载结束提示，必须配合非list 组件使用-->
 <template>
-    <cell v-if="queryEnd" class="no_data">
+    <div v-if="queryEnd" class="no_data">
         <image v-if="notDataIcon && resultSize===0" :src="notDataIcon" :style="imageStyle"></image>
         <text v-if="resultSize>0" :style="textStyle">{{noMoreTip}}</text>
         <text v-if="resultSize===0" :style="noDataStyle">{{noDataTip}}</text>
-    </cell>
+    </div>
 </template>
 <script>
     export default {

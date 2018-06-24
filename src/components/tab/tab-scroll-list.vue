@@ -52,8 +52,6 @@
                     height: "80px",
                     justifyContent: "flex-start",
                     width: "750px",
-                    paddingLeft: "20px",
-                    paddingRight: "20px"
                 }
             },
             defaultStyle: {
@@ -89,11 +87,12 @@
                 }
             },
             useHeader: {default: true},
-            selectedIndex: {default: 0}
+            selectedIndex: {default: 0},
+            web:{
+                default: weex.config.env.platform.toLowerCase() === "web"
+            }
         },
         data() {
-            let web = weex.config.env.platform.toLowerCase() === "web";
-            //web=false;
             return {
                 web,
                 removeHeight: 180,
